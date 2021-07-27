@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Alamofire",
+        "repositoryURL": "https://github.com/Alamofire/Alamofire.git",
+        "state": {
+          "branch": null,
+          "revision": "f96b619bcb2383b43d898402283924b80e2c4bae",
+          "version": "5.4.3"
+        }
+      },
+      {
+        "package": "SpacerSDK",
+        "repositoryURL": "https://github.com/asw-soi/spacer-sdk-ios.git",
+        "state": {
+          "branch": null,
+          "revision": "e710fe3c84a3d0e74c5406d323fd89bb63ded803",
+          "version": "1.0.8"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
