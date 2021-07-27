@@ -25,13 +25,13 @@
 		1E36507526A52849008337B0 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E36506C26A52849008337B0 /* ContentView.swift */; };
 		1E50C49C26A6598300B1637E /* Strings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E50C49B26A6598300B1637E /* Strings.swift */; };
 		1E50C49E26A65A2B00B1637E /* ItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E50C49D26A65A2B00B1637E /* ItemView.swift */; };
-		1E6D86E926A539EE00FA617C /* SpacerSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 1E6D86E826A539EE00FA617C /* SpacerSDK */; };
 		1E6D86EB26A5614600FA617C /* SPRErrorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E6D86EA26A5614600FA617C /* SPRErrorExtensions.swift */; };
 		1E6D86ED26A5617F00FA617C /* ExampleErrorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E6D86EC26A5617F00FA617C /* ExampleErrorExtensions.swift */; };
 		1E7325B026A4FE5D003ABC50 /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E7325AF26A4FE5D003ABC50 /* ExampleApp.swift */; };
 		1E7325B426A4FE60003ABC50 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1E7325B326A4FE60003ABC50 /* Assets.xcassets */; };
 		1E7325B726A4FE60003ABC50 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1E7325B626A4FE60003ABC50 /* Preview Assets.xcassets */; };
 		1EB89A8C26A7A80700DB56BC /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EB89A8B26A7A80700DB56BC /* HeaderView.swift */; };
+		1EE8E82B26AFD9D80021DD48 /* SpacerSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 1EE8E82A26AFD9D80021DD48 /* SpacerSDK */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -68,7 +68,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1E6D86E926A539EE00FA617C /* SpacerSDK in Frameworks */,
+				1EE8E82B26AFD9D80021DD48 /* SpacerSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -244,7 +244,7 @@
 			);
 			name = Example;
 			packageProductDependencies = (
-				1E6D86E826A539EE00FA617C /* SpacerSDK */,
+				1EE8E82A26AFD9D80021DD48 /* SpacerSDK */,
 			);
 			productName = Example;
 			productReference = 1E7325AC26A4FE5D003ABC50 /* Example.app */;
@@ -274,7 +274,7 @@
 			);
 			mainGroup = 1E7325A326A4FE5D003ABC50;
 			packageReferences = (
-				1E6D86E726A539EE00FA617C /* XCRemoteSwiftPackageReference "spacer-sdk-ios" */,
+				1EE8E82926AFD9D80021DD48 /* XCRemoteSwiftPackageReference "spacer-sdk-ios" */,
 			);
 			productRefGroup = 1E7325AD26A4FE5D003ABC50 /* Products */;
 			projectDirPath = "";
@@ -518,20 +518,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		1E6D86E726A539EE00FA617C /* XCRemoteSwiftPackageReference "spacer-sdk-ios" */ = {
+		1EE8E82926AFD9D80021DD48 /* XCRemoteSwiftPackageReference "spacer-sdk-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/asw-soi/spacer-sdk-ios.git";
+			repositoryURL = "https://github.com/tatsuya0/spacer-sdk-ios.git";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
+				branch = master;
+				kind = branch;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		1E6D86E826A539EE00FA617C /* SpacerSDK */ = {
+		1EE8E82A26AFD9D80021DD48 /* SpacerSDK */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 1E6D86E726A539EE00FA617C /* XCRemoteSwiftPackageReference "spacer-sdk-ios" */;
+			package = 1EE8E82926AFD9D80021DD48 /* XCRemoteSwiftPackageReference "spacer-sdk-ios" */;
 			productName = SpacerSDK;
 		};
 /* End XCSwiftPackageProductDependency section */
