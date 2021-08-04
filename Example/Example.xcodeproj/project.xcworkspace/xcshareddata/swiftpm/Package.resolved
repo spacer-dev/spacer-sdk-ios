@@ -12,11 +12,11 @@
       },
       {
         "package": "SpacerSDK",
-        "repositoryURL": "https://github.com/asw-soi/spacer-sdk-ios.git",
+        "repositoryURL": "https://github.com/tatsuya0/spacer-sdk-ios.git",
         "state": {
-          "branch": null,
-          "revision": "e710fe3c84a3d0e74c5406d323fd89bb63ded803",
-          "version": "1.0.8"
+          "branch": "master",
+          "revision": "92d824edbd2134c2ec39ad79aeecac0697898a55",
+          "version": null
         }
       }
     ]

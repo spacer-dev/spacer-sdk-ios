@@ -23,12 +23,12 @@ class CBLockerCentralScanService: NSObject {
         self.centralService = CBLockerCentralService(delegate: self)
     }
 
-    func scan(scanSec: Double, token: String, success: @escaping ([SPRLockerModel]) -> Void, failure: @escaping (SPRError) -> Void) {
+    func scan(token: String, success: @escaping ([SPRLockerModel]) -> Void, failure: @escaping (SPRError) -> Void) {
         self.token = token
         self.success = success
         self.failure = failure
 
-        centralService?.scan(scanSec: scanSec)
+        centralService?.scan()
     }
 }
 

@@ -9,9 +9,14 @@ import Foundation
 
 public struct SPRConfig {
     var baseURL: String
-    public init(baseURL: String) {
+    var scanSeconds: Double
+
+    public init(
+        baseURL: String = SPRConst.BaseURL,
+        scanSeconds: Double = SPRConst.ScanSeconds) {
         self.baseURL = baseURL
+        self.scanSeconds = scanSeconds
     }
 
-    static let Default = SPRConfig(baseURL: "https://ex-app.spacer.co.jp")
+    static let Default = SPRConfig()
 }
