@@ -212,6 +212,4 @@ dependencies: [
 ```
 
 ### License
-This software is released under the MIT License, see LICENSE.
-
-[LICENSE.](https://github.com/spacer-dev/spacer-sdk-ios/blob/master/LICENSE)
+This software is released under the MIT License, see [LICENSE.](https://github.com/spacer-dev/spacer-sdk-ios/blob/master/LICENSE)
