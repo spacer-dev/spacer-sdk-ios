@@ -31,7 +31,7 @@
 		1E7325B426A4FE60003ABC50 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1E7325B326A4FE60003ABC50 /* Assets.xcassets */; };
 		1E7325B726A4FE60003ABC50 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1E7325B626A4FE60003ABC50 /* Preview Assets.xcassets */; };
 		1EB89A8C26A7A80700DB56BC /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EB89A8B26A7A80700DB56BC /* HeaderView.swift */; };
-		1EE8E82B26AFD9D80021DD48 /* SpacerSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 1EE8E82A26AFD9D80021DD48 /* SpacerSDK */; };
+		1ED7F93D26BA2507002BDE9B /* SpacerSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 1ED7F93C26BA2507002BDE9B /* SpacerSDK */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -68,7 +68,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1EE8E82B26AFD9D80021DD48 /* SpacerSDK in Frameworks */,
+				1ED7F93D26BA2507002BDE9B /* SpacerSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -244,7 +244,7 @@
 			);
 			name = Example;
 			packageProductDependencies = (
-				1EE8E82A26AFD9D80021DD48 /* SpacerSDK */,
+				1ED7F93C26BA2507002BDE9B /* SpacerSDK */,
 			);
 			productName = Example;
 			productReference = 1E7325AC26A4FE5D003ABC50 /* Example.app */;
@@ -274,7 +274,7 @@
 			);
 			mainGroup = 1E7325A326A4FE5D003ABC50;
 			packageReferences = (
-				1EE8E82926AFD9D80021DD48 /* XCRemoteSwiftPackageReference "spacer-sdk-ios" */,
+				1ED7F93B26BA2507002BDE9B /* XCRemoteSwiftPackageReference "spacer-sdk-ios" */,
 			);
 			productRefGroup = 1E7325AD26A4FE5D003ABC50 /* Products */;
 			projectDirPath = "";
@@ -518,9 +518,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		1EE8E82926AFD9D80021DD48 /* XCRemoteSwiftPackageReference "spacer-sdk-ios" */ = {
+		1ED7F93B26BA2507002BDE9B /* XCRemoteSwiftPackageReference "spacer-sdk-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/tatsuya0/spacer-sdk-ios.git";
+			repositoryURL = "https://github.com/spacer-dev/spacer-sdk-ios.git";
 			requirement = {
 				branch = master;
 				kind = branch;
@@ -529,9 +529,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		1EE8E82A26AFD9D80021DD48 /* SpacerSDK */ = {
+		1ED7F93C26BA2507002BDE9B /* SpacerSDK */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 1EE8E82926AFD9D80021DD48 /* XCRemoteSwiftPackageReference "spacer-sdk-ios" */;
+			package = 1ED7F93B26BA2507002BDE9B /* XCRemoteSwiftPackageReference "spacer-sdk-ios" */;
 			productName = SpacerSDK;
 		};
 /* End XCSwiftPackageProductDependency section */
