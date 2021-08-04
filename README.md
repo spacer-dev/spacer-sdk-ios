@@ -2,7 +2,7 @@
 
 ![code](https://img.shields.io/badge/Swift-5.0%2B-orange)
 ![platforms](https://img.shields.io/badge/Platforms-iOS10.2%2B-green)
-![license](https://img.shields.io/github/license/tatsuya0/spacer-sdk-ios)
+![license](https://img.shields.io/github/license/spacer-dev/spacer-sdk-ios)
 
 
 Provides operations for using the SPACER locker.
@@ -172,7 +172,7 @@ sprLockerService.get(
 
 ## Example
 
-You can check the operation of Spacer SDK in the Example project. see [sample code](https://github.com/tatsuya0/spacer-sdk-ios/tree/master/Example/Sources)    
+You can check the operation of Spacer SDK in the Example project. see [sample code](https://github.com/spacer-dev/spacer-sdk-ios/tree/master/Example/Sources)    
 
 ### How to use
 
@@ -207,9 +207,11 @@ pod 'SpacerSDK'
 
 ```
 dependencies: [
-    .package(url: "https://github.com/tatsuya0/spacer-sdk-ios.git", .upToNextMajor(from: "1.0.0"))
+    .package(url: "https://github.com/spacer-dev/spacer-sdk-ios.git", .upToNextMajor(from: "1.0.0"))
 ]
 ```
 
 ### License
 This software is released under the MIT License, see LICENSE.
+
+[LICENSE.](https://github.com/spacer-dev/spacer-sdk-ios/blob/master/LICENSE)
