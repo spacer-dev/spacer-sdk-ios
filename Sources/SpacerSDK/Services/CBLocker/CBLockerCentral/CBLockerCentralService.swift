@@ -15,7 +15,7 @@ protocol CBLockerCentralDelegate {
 }
 
 class CBLockerCentralService: NSObject {
-    private var scanSec = 0.0
+    private var scanSeconds = CBLockerConst.ScanSeconds
     private var delegate: CBLockerCentralDelegate
     private var centralManager: CBCentralManager?
 
@@ -27,8 +27,7 @@ class CBLockerCentralService: NSObject {
         return centralManager?.isScanning == true
     }
 
-    func scan(scanSec: Double) {
-        self.scanSec = scanSec
+    func scan() {
         centralManager = CBCentralManager(delegate: self, queue: nil)
 
         postDelayed()
@@ -47,7 +46,7 @@ class CBLockerCentralService: NSObject {
     }
 
     private func postDelayed() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + scanSec) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + scanSeconds) {
             self.delegate.onDelayed()
         }
     }

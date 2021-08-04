@@ -21,17 +21,16 @@ class CBLockerCentralConnectService: NSObject {
         self.centralService = CBLockerCentralService(delegate: self)
     }
     
-    func scan(scanSec: Double, spacerId: String, success: @escaping (CBLockerModel) -> Void, failure: @escaping (SPRError) -> Void) {
+    func scan(spacerId: String, success: @escaping (CBLockerModel) -> Void, failure: @escaping (SPRError) -> Void) {
         self.spacerId = spacerId
         self.success = success
         self.failure = failure
         
-        self.centralService?.scan(scanSec: scanSec)
+        self.centralService?.scan()
     }
     
-    func put(scanSec: Double, token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+    func put(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         self.scan(
-            scanSec: scanSec,
             spacerId: spacerId,
             success: { locker in
                 self.put(token: token, locker: locker, success: success, failure: failure)
@@ -40,9 +39,8 @@ class CBLockerCentralConnectService: NSObject {
         )
     }
     
-    func take(scanSec: Double, token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+    func take(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         self.scan(
-            scanSec: scanSec,
             spacerId: spacerId,
             success: { locker in
                 self.take(token: token, locker: locker, success: success, failure: failure)
@@ -93,7 +91,7 @@ class CBLockerCentralConnectService: NSObject {
     private func disconnect(locker: CBLockerModel) {
         guard let peripheral = locker.peripheral else { return self.failure(SPRError.CBPeripheralNotFound) }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + CBLockerConst.DelayDisconnectSec) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + CBLockerConst.DelayDisconnectSeconds) {
             self.centralService?.disconnect(peripheral: peripheral)
         }
     }
