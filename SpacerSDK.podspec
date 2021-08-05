@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "SpacerSDK"
-  spec.version      = "1.0.0"
+  spec.version      = "0.1.0"
   spec.summary      = "Provides operation using spacers."
   spec.homepage     = "https://spacer.co.jp"
   spec.license      = "MIT"
