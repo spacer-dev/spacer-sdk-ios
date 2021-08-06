@@ -53,6 +53,8 @@ Please change the wording of value to your company's appropriate wording　　
 <dict>
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>Used to detect lockers.</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>Bluetooth is used to communicate with BLE devices.</string>
 ```
 
 ### 1. CB Locker Service
