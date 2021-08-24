@@ -14,8 +14,8 @@
         "package": "SpacerSDK",
         "repositoryURL": "https://github.com/spacer-dev/spacer-sdk-ios.git",
         "state": {
-          "branch": "master",
-          "revision": "a1c36c566f7cb32916400ca7da97314d7fa79631",
+          "branch": "a-sw/a-sw-dev",
+          "revision": "8d00b39f1526705e6b91c0390214a9b0cb0cf3da",
           "version": null
         }
       }

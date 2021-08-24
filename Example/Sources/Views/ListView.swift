@@ -60,7 +60,7 @@ struct ListView: View {
                             title: Strings.MyLockerReserveCancelTitle, desc: Strings.MyLockerReserveCancelDesc, textHint: Strings.MyLockerReserveTextHint, runnable: reserveCancel
                         )
                         InputItemView(
-                            title: Strings.MyLockerSharedTitle, desc: Strings.MyLockerSharedDesc, textHint: Strings.MyLockerSharedTextHint, runnable: shared
+                            title: Strings.MyLockerShareUrlKeyTitle, desc: Strings.MyLockerShareUrlKeyDesc, textHint: Strings.MyLockerShareUrlKeyTextHint, runnable: shareUrlKey
                         )
                     }
                     .padding()
@@ -222,16 +222,16 @@ struct ListView: View {
         }
     }
 
-    private func shared(urlKey: String) {
+    private func shareUrlKey(urlKey: String) {
         AppControl.shared.showLoading()
 
         exec { token in
-            myLockerService.shared(
+            myLockerService.shareUrlKey(
                 token: token,
                 urlKey: urlKey,
                 success: { myLocker in
                     AppControl.shared.hideLoading()
-                    showingAlert = AlertItem.MyLockerSharedSuccess(urlKey, myLocker)
+                    showingAlert = AlertItem.MyLockerShareUrlKeySuccess(urlKey, myLocker)
                 },
                 failure: failure
             )
