@@ -522,7 +522,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/spacer-dev/spacer-sdk-ios.git";
 			requirement = {
-				branch = master;
+				branch = "a-sw/a-sw-dev";
 				kind = branch;
 			};
 		};

@@ -25,19 +25,19 @@ class Strings {
     static let TabSPRLockerIcon = "3.square.fill"
 
     static let CBLockerScanTitle = "scan lockers"
-    static let CBLockerScanDesc = "use bluetooth to detect the locker in front of you."
+    static let CBLockerScanDesc = "use bluetooth to detect locker in front of you."
 
     static let CBLockerPutTitle = "put in locker"
-    static let CBLockerPutDesc = "connect to the locker with bluetooth and put your luggage in the locker."
+    static let CBLockerPutDesc = "connect to locker with bluetooth and put your luggage in locker."
     static let CBLockerPutTextHint = "enter spacer id"
 
     static let CBLockerTakeTitle = "take from locker"
-    static let CBLockerTakeDesc = "connect to the locker with bluetooth and take the luggage from the locker."
+    static let CBLockerTakeDesc = "connect to locker with bluetooth and take luggage from locker."
     static let CBLockerTakeTextHint = "enter spacer id"
     static let CBLockerTakeSuccessTitle = "succeeded in taking"
 
     static let CBLockerTakeWithKeyTitle = "take from locker with url key"
-    static let CBLockerTakeWithKeyDesc = "connect to the locker with bluetooth and take the luggage from the locker with url key."
+    static let CBLockerTakeWithKeyDesc = "connect to locker with bluetooth and take luggage from locker with url key."
     static let CBLockerTakeWithKeyTextHint = "enter url key"
 
     static let MyLockerGetTitle = "get my lockers"
@@ -48,11 +48,11 @@ class Strings {
     static let MyLockerReserveTextHint = "enter spacer id"
 
     static let MyLockerReserveCancelTitle = "cancel reservation"
-    static let MyLockerReserveCancelDesc = "cancel the locker you reserved."
+    static let MyLockerReserveCancelDesc = "cancel locker you reserved."
     static let MyLockerReserveCancelTextHint = "enter spacer id"
 
     static let MyLockerShareUrlKeyTitle = "share locker"
-    static let MyLockerShareUrlKeyDesc = "share the locker with yourself using the url key."
+    static let MyLockerShareUrlKeyDesc = "share locker with yourself using url key."
     static let MyLockerShareUrlKeyTextHint = "enter url key"
 
     static let SPRLockerGetTitle = "get lockers"

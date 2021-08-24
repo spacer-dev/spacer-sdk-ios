@@ -222,7 +222,7 @@ struct ListView: View {
         }
     }
 
-    private func shared(urlKey: String) {
+    private func shareUrlKey(urlKey: String) {
         AppControl.shared.showLoading()
 
         exec { token in
