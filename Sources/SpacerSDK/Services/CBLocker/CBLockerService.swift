@@ -58,7 +58,7 @@ public class CBLockerService: NSObject
     public func take(
         token: String, urlKey: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void)
     {
-        myLockerService.shared(
+        myLockerService.shareUrlKey(
             token: token,
             urlKey: urlKey,
             success: { myLocker in

@@ -72,14 +72,14 @@ public class MyLockerService {
     ///   - urlKey: Shared url key
     ///   - success: Callback on success
     ///   - failure: Callback on failure
-    public func shared(token: String, urlKey: String, success: @escaping (MyLockerModel) -> Void, failure: @escaping (SPRError) -> Void) {
-        let reqData = MyLockerSharedReqData(urlKey: urlKey)
+    public func shareUrlKey(token: String, urlKey: String, success: @escaping (MyLockerModel) -> Void, failure: @escaping (SPRError) -> Void) {
+        let reqData = MyLockerShareUrlKeyReqData(urlKey: urlKey)
 
         API.post(
-            path: ApiPaths.myLockerShared,
+            path: ApiPaths.myLockerShareUrlKey,
             token: token,
             reqData: reqData,
-            success: { (response: MyLockerSharedResData) in
+            success: { (response: MyLockerShareUrlKeyResData) in
                 guard let myLocker = response.myLocker?.toModel() else { return failure(SPRError.ApiFailed) }
                 success(myLocker)
             },

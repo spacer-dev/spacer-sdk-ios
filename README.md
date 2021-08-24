@@ -131,7 +131,7 @@ myLockerService.reserveCancel(
 )
 
 // Share your locker in use
-myLockerService.shared(
+myLockerService.shareUrlKey(
     token: token,
     urlKey: urlKey,
     success: { myLocker in
@@ -163,8 +163,6 @@ sprLockerService.get(
     token: token,
     unitIds: unitIds,
     success: { sprUnits in
-        AppControl.shared.hideLoading()
-        showingAlert = AlertItem.SPRUnitGetSuccess(sprUnits)
     },
     failure: { error in
     }

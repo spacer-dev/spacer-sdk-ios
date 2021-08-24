@@ -51,7 +51,7 @@ struct AlertItem: Identifiable {
         AlertItem(title: "succeeded in canceling \(spacerId) reservation")
     }
 
-    static func MyLockerSharedSuccess(_ urlKey: String, _ myLocker: MyLockerModel) -> AlertItem {
+    static func MyLockerShareUrlKeySuccess(_ urlKey: String, _ myLocker: MyLockerModel) -> AlertItem {
         AlertItem(title: "succeeded in sharing with \(urlKey)", message: "\(myLocker.description)")
     }
 
