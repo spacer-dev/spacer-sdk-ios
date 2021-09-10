@@ -178,15 +178,14 @@ You can check the operation of Spacer SDK in the Example project. see [sample co
 ### How to use
 
 1. Open the `Example` project
-2. Set the values of `SPR_API_BASE_URL`,`SPR_API_KEY`, and `SPR_API_USER_ID` in Environment Variables
+2. Set the values of `SDK_TOKEN` in Environment Variables
 3. Build and Run on the iphone
 
-- About Environment Variables
-    - SPR_API_BASE_URL: https://ex-api.spacer.co.jp
-    - SPR_API_KEY: Published by ownerConsocle
-    - SPR_API_USER_ID: Published by ownerConsocle
+### About `SDK_TOKEN`
 
-For more information, see [docs](https://rogue-flight-1e9.notion.site/SPACER-API-5d3f6b8831be484e94497ac822099270)
+Originally, the token issued by SPACER obtained from your server is set for testing.
+
+How to get `SDK_TOKEN`, see [docs](https://rogue-flight-1e9.notion.site/SPACER-API-5d3f6b8831be484e94497ac822099270)
 
 ### Precautions
 
