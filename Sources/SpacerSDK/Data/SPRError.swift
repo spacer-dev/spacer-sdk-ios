@@ -19,7 +19,6 @@ public struct SPRError {
     /// API (E21002001 〜 E21002100)
     static let ApiFailed = SPRError(code: "E21002001", message: "api request failed")
     static let ApiDecodingFailed = SPRError(code: "E21002002", message: "api response decoding failed")
-    static let ApiBodyEmpty = SPRError(code: "E21002003", message: "api response failed")
 
     /// CB  Central  (E21010001 〜 E21011000)
     static let CBPoweredOff = SPRError(code: "E21010001", message: "bluetooth is powered off")
