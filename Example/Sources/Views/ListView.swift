@@ -9,7 +9,7 @@ import SpacerSDK
 import SwiftUI
 
 struct ListView: View {
-    private let spacerService = SpacerService()
+    private let token = ProcessInfo.processInfo.environment["SDK_TOKEN"] ?? ""
 
     private let cbLockerService = SPR.cbLockerService()
     private let sprLockerService = SPR.sprLockerService()
@@ -93,21 +93,7 @@ struct ListView: View {
         .alert(item: $showingAlert) { item in item.alert }
     }
 
-    private func exec(success: @escaping (String) -> Void) {
-        AppControl.shared.showLoading()
-
-        spacerService.getToken(
-            success: success,
-            failure: failure
-        )
-    }
-
     private func failure(error: SPRError) {
-        AppControl.shared.hideLoading()
-        showingAlert = error.toAlertItem()
-    }
-
-    private func failure(error: ExampleError) {
         AppControl.shared.hideLoading()
         showingAlert = error.toAlertItem()
     }
@@ -115,127 +101,111 @@ struct ListView: View {
     private func scan() {
         AppControl.shared.showLoading()
 
-        exec { token in
-            cbLockerService.scan(
-                token: token,
-                success: { sprLockers in
-                    AppControl.shared.hideLoading()
-                    showingAlert = AlertItem.CBLockerScanSuccess(sprLockers)
-                },
-                failure: failure
-            )
-        }
+        cbLockerService.scan(
+            token: token,
+            success: { sprLockers in
+                AppControl.shared.hideLoading()
+                showingAlert = AlertItem.CBLockerScanSuccess(sprLockers)
+            },
+            failure: failure
+        )
     }
 
     private func put(spacerId: String) {
         AppControl.shared.showLoading()
 
-        exec { token in
-            cbLockerService.put(
-                token: token,
-                spacerId: spacerId,
-                success: {
-                    AppControl.shared.hideLoading()
-                    showingAlert = AlertItem.CBLockerPutSuccess(spacerId)
-                },
-                failure: failure
-            )
-        }
+        cbLockerService.put(
+            token: token,
+            spacerId: spacerId,
+            success: {
+                AppControl.shared.hideLoading()
+                showingAlert = AlertItem.CBLockerPutSuccess(spacerId)
+            },
+            failure: failure
+        )
     }
 
     private func take(spacerId: String) {
         AppControl.shared.showLoading()
 
-        exec { token in
-            cbLockerService.take(
-                token: token,
-                spacerId: spacerId,
-                success: {
-                    AppControl.shared.hideLoading()
-                    showingAlert = AlertItem.CBLockerTakeSuccess(spacerId)
-                },
-                failure: failure
-            )
-        }
+        cbLockerService.take(
+            token: token,
+            spacerId: spacerId,
+            success: {
+                AppControl.shared.hideLoading()
+                showingAlert = AlertItem.CBLockerTakeSuccess(spacerId)
+            },
+            failure: failure
+        )
     }
 
     private func takeWithKey(urlKey: String) {
         AppControl.shared.showLoading()
 
-        exec { token in
-            cbLockerService.take(
-                token: token,
-                urlKey: urlKey,
-                success: {
-                    AppControl.shared.hideLoading()
-                    showingAlert = AlertItem.CBLockerTakeWithKeySuccess(urlKey)
-                },
-                failure: failure
-            )
-        }
+        cbLockerService.take(
+            token: token,
+            urlKey: urlKey,
+            success: {
+                AppControl.shared.hideLoading()
+                showingAlert = AlertItem.CBLockerTakeWithKeySuccess(urlKey)
+            },
+            failure: failure
+        )
     }
 
     private func getMyLockers() {
         AppControl.shared.showLoading()
 
-        exec { token in
-            myLockerService.get(
-                token: token,
-                success: { myLockers in
-                    AppControl.shared.hideLoading()
-                    showingAlert = AlertItem.MyLockerGetSuccess(myLockers)
-                },
-                failure: failure
-            )
-        }
+        myLockerService.get(
+            token: token,
+            success: { myLockers in
+                AppControl.shared.hideLoading()
+                showingAlert = AlertItem.MyLockerGetSuccess(myLockers)
+            },
+            failure: failure
+        )
     }
 
     private func reserve(spacerId: String) {
         AppControl.shared.showLoading()
 
-        exec { token in
-            myLockerService.reserve(
-                token: token,
-                spacerId: spacerId,
-                success: { myLocker in
-                    AppControl.shared.hideLoading()
-                    showingAlert = AlertItem.MyLockerReserveSuccess(spacerId, myLocker)
-                },
-                failure: failure
-            )
-        }
+        myLockerService.reserve(
+            token: token,
+            spacerId: spacerId,
+            success: { myLocker in
+                AppControl.shared.hideLoading()
+                showingAlert = AlertItem.MyLockerReserveSuccess(spacerId, myLocker)
+            },
+            failure: failure
+        )
     }
 
     private func reserveCancel(spacerId: String) {
         AppControl.shared.showLoading()
 
-        exec { token in
-            myLockerService.reserveCancel(
-                token: token,
-                spacerId: spacerId,
-                success: {
-                    AppControl.shared.hideLoading()
-                    showingAlert = AlertItem.MyLockerReserveCancelSuccess(spacerId)
-                },
-                failure: failure
-            )
-        }
+        myLockerService.reserveCancel(
+            token: token,
+            spacerId: spacerId,
+            success: {
+                AppControl.shared.hideLoading()
+                showingAlert = AlertItem.MyLockerReserveCancelSuccess(spacerId)
+            },
+            failure: failure
+        )
     }
 
     private func shareUrlKey(urlKey: String) {
         AppControl.shared.showLoading()
 
-        exec { token in
-            myLockerService.shareUrlKey(
-                token: token,
-                urlKey: urlKey,
-                success: { myLocker in
-                    AppControl.shared.hideLoading()
-                    showingAlert = AlertItem.MyLockerShareUrlKeySuccess(urlKey, myLocker)
-                },
-                failure: failure
-            )
-        }
+        myLockerService.shareUrlKey(
+            token: token,
+            urlKey: urlKey,
+            success: { myLocker in
+                AppControl.shared.hideLoading()
+                showingAlert = AlertItem.MyLockerShareUrlKeySuccess(urlKey, myLocker)
+            },
+            failure: failure
+        )
     }
 
     private func getSPRLockers(spacerIdsText: String) {
@@ -243,17 +213,15 @@ struct ListView: View {
 
         AppControl.shared.showLoading()
 
-        exec { token in
-            sprLockerService.get(
-                token: token,
-                spacerIds: spacerIds,
-                success: { sprLockers in
-                    AppControl.shared.hideLoading()
-                    showingAlert = AlertItem.SPRLockerGetSuccess(sprLockers)
-                },
-                failure: failure
-            )
-        }
+        sprLockerService.get(
+            token: token,
+            spacerIds: spacerIds,
+            success: { sprLockers in
+                AppControl.shared.hideLoading()
+                showingAlert = AlertItem.SPRLockerGetSuccess(sprLockers)
+            },
+            failure: failure
+        )
     }
 
     private func getSPRUnits(unitIdsText: String) {
@@ -261,17 +229,15 @@ struct ListView: View {
 
         AppControl.shared.showLoading()
 
-        exec { token in
-            sprLockerService.get(
-                token: token,
-                unitIds: unitIds,
-                success: { sprUnits in
-                    AppControl.shared.hideLoading()
-                    showingAlert = AlertItem.SPRUnitGetSuccess(sprUnits)
-                },
-                failure: failure
-            )
-        }
+        sprLockerService.get(
+            token: token,
+            unitIds: unitIds,
+            success: { sprUnits in
+                AppControl.shared.hideLoading()
+                showingAlert = AlertItem.SPRUnitGetSuccess(sprUnits)
+            },
+            failure: failure
+        )
     }
 }
 

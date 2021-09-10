@@ -1,7 +1,8 @@
 # SpacerSDK
 
 ![code](https://img.shields.io/badge/Swift-5.0%2B-orange)
-![platforms](https://img.shields.io/badge/Platforms-iOS10.2%2B-green)
+![platforms](https://img.shields.io/badge/IOS-10.2%2B-orange)
+![bluetooth](https://img.shields.io/badge/bluetooth-4.2%2B-brightgreen)
 ![license](https://img.shields.io/github/license/spacer-dev/spacer-sdk-ios)
 
 
@@ -24,7 +25,7 @@ Provides locker operation using BLE
 Provides operation of the locker you are using
 
 - Get a locker in use
-- Reserve available lockers
+- Reserve an available locker
 - Cancel the reserved locker
 - Share your locker in use
 
@@ -110,7 +111,7 @@ myLockerService.get(
     }
 )
 
-// Reserve available lockers
+// Reserve an available locker
 myLockerService.reserve(
     token: token,
     spacerId: spacerId,

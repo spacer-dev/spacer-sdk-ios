@@ -38,7 +38,7 @@ extension CBLockerPeripheralTakeService: CBLockerPeripheralDelegate {
                         return success(data)
                     }
                 }
-                failure(SPRError.ApiResDataFailed)
+                failure(SPRError.ApiFailed)
             },
             failure: failure)
     }

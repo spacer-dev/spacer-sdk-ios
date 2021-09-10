@@ -33,17 +33,17 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
 
         guard error == nil else {
             print("peripheral didDiscoverServices failed with error: \(String(describing: error))")
-            return delegate.onFailure(SPRError.CBDiscoveringServicesFailed)
+            return delegate.onFailure(SPRError.CBServiceNotFound)
         }
 
         guard let services = peripheral.services else {
             print("peripheral didDiscoverServices, services is nil")
-            return delegate.onFailure(SPRError.CBDiscoveringServicesFailed)
+            return delegate.onFailure(SPRError.CBServiceNotFound)
         }
 
         if services.isEmpty {
             print("peripheral didDiscoverServices, services is empty")
-            return delegate.onFailure(SPRError.CBDiscoveringServicesFailed)
+            return delegate.onFailure(SPRError.CBServiceNotFound)
         }
 
         for service in services {
@@ -57,7 +57,7 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
 
         guard error == nil else {
             print("peripheral didDiscoverCharacteristicsFor failed with error: \(String(describing: error))")
-            return delegate.onFailure(SPRError.CBDiscoveringCharacteristicsFailed)
+            return delegate.onFailure(SPRError.CBCharacteristicNotFound)
         }
 
         let characteristic = service.characteristics?.first(where: { $0.uuid.isEqual(CBLockerConst.CharacteristicUUID) })
@@ -70,7 +70,7 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
                 peripheral.readValue(for: characteristic)
             }
         } else {
-            return delegate.onFailure(SPRError.CBDiscoveringCharacteristicsFailed)
+            return delegate.onFailure(SPRError.CBCharacteristicNotFound)
         }
     }
 
