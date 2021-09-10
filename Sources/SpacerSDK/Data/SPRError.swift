@@ -19,7 +19,7 @@ public struct SPRError {
     /// API (E21002001 〜 E21002100)
     static let ApiFailed = SPRError(code: "E21002001", message: "api request failed")
     static let ApiDecodingFailed = SPRError(code: "E21002002", message: "api response decoding failed")
-    static let ApiResDataFailed = SPRError(code: "E21002001", message: "api response data failed")
+    static let ApiBodyEmpty = SPRError(code: "E21002003", message: "api response failed")
 
     /// CB  Central  (E21010001 〜 E21011000)
     static let CBPoweredOff = SPRError(code: "E21010001", message: "bluetooth is powered off")
@@ -32,8 +32,8 @@ public struct SPRError {
     static let CBConnectingFailed = SPRError(code: "E21010102", message: "central connecting failed")
 
     /// CB  Peripheral(E21011001 〜 E21012000)
-    static let CBDiscoveringServicesFailed = SPRError(code: "E21011001", message: "peripheral discovering services failed")
-    static let CBDiscoveringCharacteristicsFailed = SPRError(code: "E21011002", message: "peripheral discovering characteristics failed")
+    static let CBServiceNotFound = SPRError(code: "E21011001", message: "peripheral service is not found")
+    static let CBCharacteristicNotFound = SPRError(code: "E21011002", message: "peripheral characteristic is not found")
     static let CBReadingCharacteristicFailed = SPRError(code: "E21011003", message: "peripheral reading characteristic failed")
     static let CBWritingCharacteristicFailed = SPRError(code: "E21011004", message: "peripheral writing characteristic failed")
 
