@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = "SpacerSDK"
-  spec.version      = "1.0.1"
+  spec.version      = "1.0.2"
   spec.summary      = "IOS SDK for using SPACER locker"
   spec.homepage     = "https://github.com/spacer-dev/spacer-sdk-ios"
   spec.license      = "MIT"
