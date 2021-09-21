@@ -185,15 +185,8 @@ You can check the operation of Spacer SDK in the Example project. see [sample co
 
 Originally, the token issued by SPACER obtained from your server is set for testing.
 
-How to get `SDK_TOKEN`, see [docs](https://rogue-flight-1e9.notion.site/SPACER-API-5d3f6b8831be484e94497ac822099270)
+How to get `sdk.token`, see [docs](https://rogue-flight-1e9.notion.site/SPACER-API-5d3f6b8831be484e94497ac822099270)
 
-### Precautions
-
-The `Example` project is connected to `ex-api.spacer.co.jp` from the client application to check the operation,
-Originally, `SPR_API_KEY` should be set to a white IP so that it can only be accessed from your server.
-
-Temporarily set the `SPR_API_KEY` limit to `any` or `client ip` to check the operation.
-After checking the operation, cancel the `any` setting from the viewpoint of security.
 
 ## Installation
 
