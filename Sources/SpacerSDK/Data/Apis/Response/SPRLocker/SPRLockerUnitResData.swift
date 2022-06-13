@@ -13,4 +13,6 @@ struct SPRLockerUnitResData: Codable {
     public var close: String?
     public var address: String?
     public var spacers: [SPRLockerResData]?
+    public var dispOrder: Int?
+    public var lockerType: Int?
 }

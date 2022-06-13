@@ -12,6 +12,8 @@ public struct SPRLockerUnitModel: Identifiable {
     public var open: String?
     public var close: String?
     public var address: String?
+    public var dispOrder: Int?
+    public var lockerType: Int?
     public var spacers: [SPRLockerModel]?
 
     public var description: String {

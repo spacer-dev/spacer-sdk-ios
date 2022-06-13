@@ -14,6 +14,7 @@ struct ListView: View {
     private let cbLockerService = SPR.cbLockerService()
     private let sprLockerService = SPR.sprLockerService()
     private let myLockerService = SPR.myLockerService()
+    private let locationService = SPR.locationService()
 
     private let vStackSpacing: CGFloat = 10.0
 
@@ -80,6 +81,9 @@ struct ListView: View {
                         )
                         InputItemView(
                             title: Strings.SPRUnitGetTitle, desc: Strings.SPRUnitGetDesc, textHint: Strings.SPRUnitGetTextHint, runnable: getSPRUnits
+                        )
+                        InputItemView(
+                            title: Strings.SPRLocationGetTitle, desc: Strings.SPRLocationGetDesc, textHint: Strings.SPRLocationGetTextHint, runnable: getSPRLocation
                         )
                     }
                     .padding()
@@ -235,6 +239,20 @@ struct ListView: View {
             success: { sprUnits in
                 AppControl.shared.hideLoading()
                 showingAlert = AlertItem.SPRUnitGetSuccess(sprUnits)
+            },
+            failure: failure
+        )
+    }
+    
+    private func getSPRLocation(locationId: String) {
+        AppControl.shared.showLoading()
+        
+        locationService.get(
+            token: token,
+            locationId: locationId,
+            success: { sprLocation in
+                AppControl.shared.hideLoading()
+                showingAlert = AlertItem.SPRUnitGetSuccess(sprLocation)
             },
             failure: failure
         )
