@@ -17,7 +17,7 @@ public struct LocationModel: Identifiable {
     public var units: [SPRLockerUnitModel]?
     
     public var description: String {
-        "id:\(id),name:\(name),address:\(address),detail:\(detail),open:\(open ?? ""),close:\(close ?? ""),units:\(units ?? "")"
+        "id:\(id),name:\(name),address:\(address),detail:\(detail),open:\(open ?? ""),close:\(close ?? ""),units:\(units ?? [])"
     }
 }
 
