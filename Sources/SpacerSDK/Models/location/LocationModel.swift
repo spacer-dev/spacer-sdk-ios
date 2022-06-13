@@ -15,6 +15,10 @@ public struct LocationModel: Identifiable {
     public var open: String?
     public var close: String?
     public var units: [SPRLockerUnitModel]?
+    
+    public var description: String {
+        "id:\(id),name:\(name),address:\(address),detail:\(detail),open:\(open ?? ""),close:\(close ?? ""),units:\(units ?? "")"
+    }
 }
 
 extension LocationResData {

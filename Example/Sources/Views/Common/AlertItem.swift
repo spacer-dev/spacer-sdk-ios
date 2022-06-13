@@ -64,4 +64,8 @@ struct AlertItem: Identifiable {
         let text = sprUnits.map { $0.description }.joined(separator: "\n")
         return AlertItem(title: "succeeded in getting units", message: "\(text)")
     }
+    
+    static func SPRLocationGetSuccess(_ sprLocation: LocationModel) -> AlertItem {
+        AlertItem(title: "succeeded in getting location", message: sprLocation.description)
+    }
 }

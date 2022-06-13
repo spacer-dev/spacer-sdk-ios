@@ -252,7 +252,7 @@ struct ListView: View {
             locationId: locationId,
             success: { sprLocation in
                 AppControl.shared.hideLoading()
-                showingAlert = AlertItem.SPRUnitGetSuccess(sprLocation)
+                showingAlert = AlertItem.SPRLocationGetSuccess(sprLocation)
             },
             failure: failure
         )
