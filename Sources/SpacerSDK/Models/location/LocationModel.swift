@@ -17,7 +17,8 @@ public struct LocationModel: Identifiable {
     public var units: [SPRLockerUnitModel]?
     
     public var description: String {
-        "id:\(id),name:\(name),address:\(address),detail:\(detail),open:\(open ?? ""),close:\(close ?? ""),units:\(units ?? [])"
+        let unitsText = units?.map { $0.description }.joined(separator: "\n") ?? ""
+        return "id:\(id),name:\(name),address:\(address),detail:\(detail),open:\(open ?? ""),close:\(close ?? ""),units:\n\(unitsText)"
     }
 }
 
