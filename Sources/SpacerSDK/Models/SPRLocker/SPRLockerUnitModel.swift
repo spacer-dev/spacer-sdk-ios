@@ -9,22 +9,19 @@ import Foundation
 
 public struct SPRLockerUnitModel: Identifiable {
     public var id: String
-    public var open: String?
-    public var close: String?
-    public var address: String?
     public var dispOrder: Int?
     public var lockerType: Int?
     public var spacers: [SPRLockerModel]?
 
     public var description: String {
         let spacersText = spacers?.map { $0.description }.joined(separator: "\n") ?? ""
-        return "id:\(id),open:\(open ?? ""),close:\(close ?? ""),address:\(address ?? ""),spacers:\n\(spacersText)"
+        return "id:\(id),spacers:\n\(spacersText)"
     }
 }
 
 extension SPRLockerUnitResData {
     func toModel() -> SPRLockerUnitModel {
         let spacers = spacers?.map { $0.toModel() }
-        return SPRLockerUnitModel(id: id, open: open, close: close, address: address, spacers: spacers)
+        return SPRLockerUnitModel(id: id, spacers: spacers)
     }
 }
