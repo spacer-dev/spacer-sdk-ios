@@ -63,7 +63,7 @@ class Strings {
     static let SPRUnitGetDesc = "get multiple locker unit basic information."
     static let SPRUnitGetTextHint = "enter unit ids separated by commas"
     
-    static let SPRLocationGetTitle = "get units location"
+    static let SPRLocationGetTitle = "get location"
     static let SPRLocationGetDesc = "get multiple unit location basic information."
     static let SPRLocationGetTextHint = "enter location id"
 }
