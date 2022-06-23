@@ -10,6 +10,10 @@ public class SpacerSDK {
     public class func sprLockerService() -> SPRLockerService {
         return SPRLockerService()
     }
+    
+    public class func locationService() -> LocationService {
+        return LocationService()
+    }
 
     private(set) static var config = SPRConfig.Default
     public class func configure(config: SPRConfig) {
