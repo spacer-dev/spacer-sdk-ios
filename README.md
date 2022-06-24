@@ -224,7 +224,7 @@ pod 'SpacerSDK'
 
 ```
 dependencies: [
-    .package(url: "https://github.com/spacer-dev/spacer-sdk-ios.git", .upToNextMajor(from: "1.0.0"))
+    .package(url: "https://github.com/spacer-dev/spacer-sdk-ios.git", .upToNextMajor(from: "1.1.0"))
 ]
 ```
 
