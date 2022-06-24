@@ -34,7 +34,13 @@ Provides operation of the locker you are using
 Provides basic locker information
 
 - Get multiple locker basic information
-- Get multiple locker unit basic information  
+- Get multiple locker unit basic information
+
+### 4. Location Service
+
+Provides basic location information
+
+- Get multiple unit location basic information
   
 ## Requirement
 
@@ -169,6 +175,24 @@ sprLockerService.get(
     }
 )
 
+```
+
+### 4. Location Service
+
+```swift
+import SpacerSDK
+
+let locationService = SPR.locationService()
+
+// Get multiple unit location basic information
+locationService.get(
+    token: token,
+    locationId: locationId,
+    success: { sprLocation in
+    },
+    failure: { error in
+    }
+)
 ```
 
 ## Example
