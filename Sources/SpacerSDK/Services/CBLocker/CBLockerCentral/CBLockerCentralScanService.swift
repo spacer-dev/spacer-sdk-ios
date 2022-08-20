@@ -43,7 +43,7 @@ extension CBLockerCentralScanService: CBLockerCentralDelegate {
         }
     }
 
-    func onDelayed() {
+    func onPostDelayed() {
         centralService?.stopScan()
 
         let spacerIds = lockers.map { $0.id }

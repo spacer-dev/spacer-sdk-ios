@@ -12,7 +12,8 @@ class CBLockerCentralConnectService: NSObject {
     private var centralService: CBLockerCentralService?
     
     private var spacerId: String!
-    private var success: (CBLockerModel) -> Void = { _ in }
+    private var connectable: (CBLockerModel) -> Void = { _ in }
+    private var success: () -> Void = {}
     private var failure: (SPRError) -> Void = { _ in }
     
     override init() {
@@ -20,27 +21,29 @@ class CBLockerCentralConnectService: NSObject {
         self.centralService = CBLockerCentralService(delegate: self)
     }
     
-    func scan(spacerId: String, success: @escaping (CBLockerModel) -> Void, failure: @escaping (SPRError) -> Void) {
+    func scan(spacerId: String, connectable: @escaping (CBLockerModel) -> Void) {
         self.spacerId = spacerId
-        self.success = success
-        self.failure = failure
-        
+        self.connectable = connectable
         self.centralService?.scan()
     }
     
     func put(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+        self.success = success
+        self.failure = failure
+        
         self.scan(
             spacerId: spacerId,
-            success: { locker in self.execWithRetry(action: .put, token: token, locker: locker) },
-            failure: failure
+            connectable: { locker in self.execWithRetry(action: .put, token: token, locker: locker) }
         )
     }
     
     func take(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+        self.success = success
+        self.failure = failure
+        
         self.scan(
             spacerId: spacerId,
-            success: { locker in self.execWithRetry(action: .take, token: token, locker: locker) },
-            failure: failure
+            connectable: { locker in self.execWithRetry(action: .take, token: token, locker: locker) }
         )
     }
     
@@ -52,7 +55,7 @@ class CBLockerCentralConnectService: NSObject {
         let peripheralDelegate =
             CBLockerPeripheralService.Factory.create(
                 type: action, token: token, locker: locker, execMode: execMode, retryNum: retryNum, success: {
-                    self.success(locker)
+                    self.success()
                     self.disconnect(locker: locker)
                 },
                 failure: { error in
@@ -74,6 +77,8 @@ class CBLockerCentralConnectService: NSObject {
     }
     
     private func retryOrFailure(error: SPRError, locker: CBLockerModel, retryNum: Int, executable: @escaping (CBLockerExecMode, Int) -> Void) {
+        print("##### retryNum:\(retryNum)")
+              
         if retryNum < CBLockerConst.MaxRetryNum {
             executable(.normal, retryNum + 1)
         } else {
@@ -95,11 +100,11 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     func onDiscovered(locker: CBLockerModel) {
         if locker.id == self.spacerId {
             self.centralService?.stopScan()
-            self.success(locker)
+            self.connectable(locker)
         }
     }
     
-    func onDelayed() {
+    func onPostDelayed() {
         if self.centralService?.isScanning() == true {
             self.centralService?.stopScan()
             self.failure(SPRError.CBCentralTimeout)

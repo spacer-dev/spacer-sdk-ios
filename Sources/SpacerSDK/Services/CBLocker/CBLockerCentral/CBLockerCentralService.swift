@@ -10,7 +10,7 @@ import Foundation
 
 protocol CBLockerCentralDelegate {
     func onDiscovered(locker: CBLockerModel)
-    func onDelayed()
+    func onPostDelayed()
     func onFailure(_ error: SPRError)
 }
 
@@ -47,7 +47,7 @@ class CBLockerCentralService: NSObject {
 
     private func postDelayed() {
         DispatchQueue.main.asyncAfter(deadline: .now() + scanSeconds) {
-            self.delegate.onDelayed()
+            self.delegate.onPostDelayed()
         }
     }
 }
