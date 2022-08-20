@@ -12,15 +12,15 @@ class CBLockerPeripheralPutService: NSObject {
     private var token = String()
     private var success: () -> Void = {}
     private var failure: (SPRError) -> Void = { _ in }
-    private(set) var connectService: CBLockerPeripheralService?
+    private(set) var peripheralDelegate: CBLockerPeripheralService?
 
-    init(token: String, locker: CBLockerModel, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+    init(token: String, locker: CBLockerModel, execMode: CBLockerExecMode, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         super.init()
 
         self.token = token
         self.success = success
         self.failure = failure
-        connectService = CBLockerPeripheralService(locker: locker, delegate: self)
+        peripheralDelegate = CBLockerPeripheralService(locker: locker, execMode: execMode, delegate: self)
     }
 }
 

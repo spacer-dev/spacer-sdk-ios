@@ -16,4 +16,11 @@ public enum CBLockerConst {
     static let AdvertisementName = "kCBAdvDataLocalName"
     static let PutKeyPrefix = "543214723567xxxrw"
     static let TakeKeyPrefix = "543214723567xxxw"
+    
+    static let MaxRetryNum = 8
+    static let StartTimeoutMs = 5000;
+    static let iscoverTimeoutMs = 5000;
+    static let ReadTimeoutMs = 5000;
+    static let WriteTimeoutMs = 5000;
+    static let DuringTimeoutMs = 60000;
 }

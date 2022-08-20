@@ -10,12 +10,12 @@ import Foundation
 
 public struct CBLockerModel: Identifiable {
     public var id: String
-    var operation: CBLockerOperation = .none
+    var status: CBLockerStatus = .none
     var readData: String = ""
     var peripheral: CBPeripheral?
     var characteristic: CBCharacteristic?
 
-    mutating func update(_ operation: CBLockerOperation) {
-        self.operation = operation
+    mutating func update(status: CBLockerStatus) {
+        self.status = status
     }
 }

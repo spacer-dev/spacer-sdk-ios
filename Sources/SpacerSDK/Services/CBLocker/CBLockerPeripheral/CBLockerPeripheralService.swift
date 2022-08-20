@@ -15,15 +15,33 @@ protocol CBLockerPeripheralDelegate {
 }
 
 class CBLockerPeripheralService: NSObject {
-    var skipFirstRead: Bool
-    var delegate: CBLockerPeripheralDelegate
-
     var locker: CBLockerModel!
+    var execMode: CBLockerExecMode
+    var delegate: CBLockerPeripheralDelegate
+    var skipFirstRead: Bool
 
-    init(locker: CBLockerModel, delegate: CBLockerPeripheralDelegate, skipFirstRead: Bool = false) {
+    init(locker: CBLockerModel, execMode: CBLockerExecMode, delegate: CBLockerPeripheralDelegate, skipFirstRead: Bool = false) {
         self.locker = locker
+        self.execMode = execMode
         self.delegate = delegate
         self.skipFirstRead = skipFirstRead
+    }
+
+    enum Factory {
+        static func create(type: CBLockerActionType,
+                           token: String,
+                           locker: CBLockerModel,
+                           execMode: CBLockerExecMode,
+                           retryNum: Int,
+                           success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) -> CBPeripheralDelegate?
+        {
+            if type == .put {
+                return CBLockerPeripheralPutService(token: token, locker: locker, execMode: execMode, success: success, failure: failure).peripheralDelegate
+            } else if type == .take {
+                return CBLockerPeripheralTakeService(token: token, locker: locker, execMode: execMode, success: success, failure: failure).peripheralDelegate
+            }
+            return nil
+        }
     }
 }
 
@@ -89,11 +107,11 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
 
         locker.readData = String(bytes: characteristicValue, encoding: String.Encoding.ascii) ?? ""
 
-        print("peripheral didUpdateValueFor, read data: \(locker.readData), operation: \(locker.operation)")
+        print("peripheral didUpdateValueFor, read data: \(locker.readData), status: \(locker.status)")
 
-        if locker.operation == .none {
+        if locker.status == .none {
             self.peripheral(peripheral, willWriteValueFor: characteristic)
-        } else if locker.operation == .write {
+        } else if locker.status == .write {
             delegate.onSuccess(locker: locker)
         }
     }
@@ -106,7 +124,7 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
             return delegate.onFailure(SPRError.CBWritingCharacteristicFailed)
         }
 
-        locker.update(.write)
+        locker.update(status: .write)
         peripheral.readValue(for: characteristic)
     }
 

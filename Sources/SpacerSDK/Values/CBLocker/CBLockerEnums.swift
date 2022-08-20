@@ -7,8 +7,19 @@
 
 import Foundation
 
-enum CBLockerOperation {
+enum CBLockerActionType {
+    case put
+    case take
+}
+
+enum CBLockerStatus {
     case none
     case read
     case write
+}
+
+enum CBLockerExecMode {
+    case normal
+    case retryFromConnBeginning
+    case retryFromConnSaveDB
 }

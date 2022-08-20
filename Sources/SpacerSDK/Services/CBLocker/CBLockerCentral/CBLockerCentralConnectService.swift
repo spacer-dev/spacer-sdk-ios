@@ -17,7 +17,6 @@ class CBLockerCentralConnectService: NSObject {
     
     override init() {
         super.init()
-        
         self.centralService = CBLockerCentralService(delegate: self)
     }
     
@@ -32,9 +31,7 @@ class CBLockerCentralConnectService: NSObject {
     func put(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         self.scan(
             spacerId: spacerId,
-            success: { locker in
-                self.put(token: token, locker: locker, success: success, failure: failure)
-            },
+            success: { locker in self.execWithRetry(action: .put, token: token, locker: locker) },
             failure: failure
         )
     }
@@ -42,50 +39,47 @@ class CBLockerCentralConnectService: NSObject {
     func take(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         self.scan(
             spacerId: spacerId,
-            success: { locker in
-                self.take(token: token, locker: locker, success: success, failure: failure)
-            },
+            success: { locker in self.execWithRetry(action: .take, token: token, locker: locker) },
             failure: failure
         )
     }
     
-    private func put(token: String, locker: CBLockerModel, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
-        guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
+    private func execWithRetry(
+        action: CBLockerActionType, token: String, locker: CBLockerModel, execMode: CBLockerExecMode = .normal, retryNum: Int = 0
+    ) {
+        guard let peripheral = locker.peripheral else { return self.failure(SPRError.CBPeripheralNotFound) }
         
-        let putService = CBLockerPeripheralPutService(
-            token: token,
-            locker: locker,
-            success: {
-                success()
-                self.disconnect(locker: locker)
-            },
-            failure: { error in
-                failure(error)
-                self.disconnect(locker: locker)
-            }
-        )
+        let peripheralDelegate =
+            CBLockerPeripheralService.Factory.create(
+                type: action, token: token, locker: locker, execMode: execMode, retryNum: retryNum, success: {
+                    self.success(locker)
+                    self.disconnect(locker: locker)
+                },
+                failure: { error in
+                    self.retryOrFailure(
+                        error: error,
+                        locker: locker,
+                        retryNum: retryNum,
+                        executable: { execMode, retryNum in
+                            self.execWithRetry(action: action, token: token, locker: locker, execMode: execMode, retryNum: retryNum)
+                        }
+                    )
+                }
+            )
         
-        locker.peripheral?.delegate = putService.connectService
+        guard let delegate = peripheralDelegate else { return self.failure(SPRError.CBConnectingFailed) }
+        
+        locker.peripheral?.delegate = delegate
         self.centralService?.connect(peripheral: peripheral)
     }
     
-    private func take(token: String, locker: CBLockerModel, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
-        guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
-        
-        let takeService = CBLockerPeripheralTakeService(
-            token: token,
-            locker: locker,
-            success: {
-                success()
-                self.disconnect(locker: locker)
-            },
-            failure: { error in
-                failure(error)
-                self.disconnect(locker: locker)
-            }
-        )
-        locker.peripheral?.delegate = takeService.connectService
-        self.centralService?.connect(peripheral: peripheral)
+    private func retryOrFailure(error: SPRError, locker: CBLockerModel, retryNum: Int, executable: @escaping (CBLockerExecMode, Int) -> Void) {
+        if retryNum < CBLockerConst.MaxRetryNum {
+            executable(.normal, retryNum + 1)
+        } else {
+            self.failure(error)
+            self.disconnect(locker: locker)
+        }
     }
     
     private func disconnect(locker: CBLockerModel) {
