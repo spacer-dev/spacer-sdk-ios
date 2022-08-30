@@ -17,9 +17,3 @@ enum CBLockerStatus {
     case read
     case write
 }
-
-enum CBLockerExecMode {
-    case normal
-    case retryFromConnBeginning
-    case retryFromConnSaveDB
-}

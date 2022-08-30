@@ -18,9 +18,9 @@ public enum CBLockerConst {
     static let TakeKeyPrefix = "543214723567xxxw"
     
     static let MaxRetryNum = 8
-    static let StartTimeoutMs = 5000;
-    static let iscoverTimeoutMs = 5000;
-    static let ReadTimeoutMs = 5000;
-    static let WriteTimeoutMs = 5000;
-    static let DuringTimeoutMs = 60000;
+    static let StartTimeoutSeconds = 5.0;
+    static let DiscoverTimeoutSeconds = 5.0;
+    static let ReadTimeoutSeconds = 5.0;
+    static let WriteTimeoutSeconds = 5.0;
+    static let DuringTimeoutSeconds = 60.0;
 }

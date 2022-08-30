@@ -10,12 +10,19 @@ import Foundation
 
 public struct CBLockerModel: Identifiable {
     public var id: String
-    var status: CBLockerStatus = .none
-    var readData: String = ""
-    var peripheral: CBPeripheral?
-    var characteristic: CBCharacteristic?
+    private(set) var status: CBLockerStatus = .none
+    private(set) var readData: String = ""
+    private(set) var peripheral: CBPeripheral?
 
-    mutating func update(status: CBLockerStatus) {
+    mutating func setPeripheral(_ peripheral: CBPeripheral) {
+        self.peripheral = peripheral
+    }
+    
+    mutating func setReadData(_ readData: String) {
+        self.readData = readData
+    }
+    
+    mutating func updateStatus(_ status: CBLockerStatus) {
         self.status = status
     }
 }

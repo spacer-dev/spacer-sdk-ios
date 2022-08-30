@@ -10,22 +10,23 @@ import Foundation
 
 class CBLockerPeripheralPutService: NSObject {
     private var token = String()
-    private var success: () -> Void = {}
-    private var failure: (SPRError) -> Void = { _ in }
     private(set) var peripheralDelegate: CBLockerPeripheralService?
 
-    init(token: String, locker: CBLockerModel, execMode: CBLockerExecMode, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+    init(token: String, locker: CBLockerModel, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         super.init()
 
+        NSLog(" CBLockerPeripheralPutService init")
+        
         self.token = token
-        self.success = success
-        self.failure = failure
-        peripheralDelegate = CBLockerPeripheralService(locker: locker, execMode: execMode, delegate: self)
+        peripheralDelegate = CBLockerPeripheralService(locker: locker, delegate: self, skipFirstRead: false, success: success, failure: failure)
     }
 }
 
 extension CBLockerPeripheralPutService: CBLockerPeripheralDelegate {
-    func onGetKey(locker: CBLockerModel, success: @escaping (Data) -> Void, failure: @escaping (SPRError) -> Void) {
+    func getKey(locker: CBLockerModel, success: @escaping (Data) -> Void, failure: @escaping (SPRError) -> Void) {
+        
+        NSLog(" CBLockerPeripheralPutService getKey \(locker.id), \(locker.readData)")
+        
         let reqData = KeyGenerateReqData(spacerId: locker.id, readData: locker.readData)
 
         API.post(
@@ -43,20 +44,18 @@ extension CBLockerPeripheralPutService: CBLockerPeripheralDelegate {
             failure: failure)
     }
 
-    func onSuccess(locker: CBLockerModel) {
+    func saveKey(locker: CBLockerModel, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         let reqData = KeyGenerateResultReqData(spacerId: locker.id, readData: locker.readData)
 
+        NSLog(" CBLockerPeripheralPutService saveKey \(locker.id) \(locker.readData)")
+        
         API.post(
             path: ApiPaths.KeyGenerateResult,
             token: token,
             reqData: reqData,
             success: { (_: KeyGenerateResultResData) in
-                self.success()
+                success()
             },
             failure: failure)
-    }
-
-    func onFailure(_ error: SPRError) {
-        failure(error)
     }
 }

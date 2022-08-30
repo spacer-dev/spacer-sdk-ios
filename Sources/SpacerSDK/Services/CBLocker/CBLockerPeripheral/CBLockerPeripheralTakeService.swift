@@ -10,23 +10,23 @@ import Foundation
 
 class CBLockerPeripheralTakeService: NSObject {
     private var token = String()
-    private var success: () -> Void = {}
-    private var failure: (SPRError) -> Void = { _ in }
     private(set) var peripheralDelegate: CBLockerPeripheralService?
 
-    init(token: String, locker: CBLockerModel, execMode: CBLockerExecMode, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+    init(token: String, locker: CBLockerModel, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         super.init()
 
-        self.token = token
-        self.success = success
-        self.failure = failure
+        NSLog(" CBLockerPeripheralTakeService init")
         
-        peripheralDelegate = CBLockerPeripheralService(locker: locker, execMode: execMode, delegate: self, skipFirstRead: true)
+        self.token = token
+
+        peripheralDelegate = CBLockerPeripheralService(locker: locker, delegate: self, skipFirstRead: true, success: success, failure: failure)
     }
 }
 
 extension CBLockerPeripheralTakeService: CBLockerPeripheralDelegate {
-    func onGetKey(locker: CBLockerModel, success: @escaping (Data) -> Void, failure: @escaping (SPRError) -> Void) {
+    func getKey(locker: CBLockerModel, success: @escaping (Data) -> Void, failure: @escaping (SPRError) -> Void) {
+        NSLog(" CBLockerPeripheralTakeService getKey \(locker.id) \(locker.readData)")
+        
         let reqData = KeyGetReqData(spacerId: locker.id)
 
         API.post(
@@ -44,7 +44,9 @@ extension CBLockerPeripheralTakeService: CBLockerPeripheralDelegate {
             failure: failure)
     }
 
-    func onSuccess(locker: CBLockerModel) {
+    func saveKey(locker: CBLockerModel, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+        NSLog(" CBLockerPeripheralTakeService saveKey \(locker.id) \(locker.readData)")
+        
         let reqData = KeyGetResultReqData(spacerId: locker.id, readData: locker.readData)
 
         API.post(
@@ -52,12 +54,8 @@ extension CBLockerPeripheralTakeService: CBLockerPeripheralDelegate {
             token: token,
             reqData: reqData,
             success: { (_: KeyGetResultResData) in
-                self.success()
+                success()
             },
             failure: failure)
-    }
-
-    func onFailure(_ error: SPRError) {
-        failure(error)
     }
 }

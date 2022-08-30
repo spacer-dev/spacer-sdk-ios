@@ -10,10 +10,6 @@ import Foundation
 
 public class CBLockerService: NSObject
 {
-    private lazy var myLockerService = MyLockerService()
-    private lazy var centralScanService = CBLockerCentralScanService()
-    private lazy var centralConnectService = CBLockerCentralConnectService()
-
     /// Discover peripheral devices
     /// - Parameters:
     ///   - token: User token created on the server
@@ -22,7 +18,7 @@ public class CBLockerService: NSObject
     public func scan(
         token: String, success: @escaping ([SPRLockerModel]) -> Void, failure: @escaping (SPRError) -> Void)
     {
-        centralScanService.scan(token: token, success: success, failure: failure)
+        CBLockerCentralScanService().scan(token: token, success: success, failure: failure)
     }
 
     /// Connect to a peripheral device. To put luggage in the locker
@@ -34,7 +30,7 @@ public class CBLockerService: NSObject
     public func put(
         token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void)
     {
-        centralConnectService.put(token: token, spacerId: spacerId, success: success, failure: failure)
+        CBLockerCentralConnectService().put(token: token, spacerId: spacerId, success: success, failure: failure)
     }
 
     /// Connect to a peripheral device. To take luggage from your locker
@@ -46,7 +42,7 @@ public class CBLockerService: NSObject
     public func take(
         token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void)
     {
-        centralConnectService.take(token: token, spacerId: spacerId, success: success, failure: failure)
+        CBLockerCentralConnectService().take(token: token, spacerId: spacerId, success: success, failure: failure)
     }
 
     /// Connect to take luggage from locker with shared key
@@ -58,7 +54,7 @@ public class CBLockerService: NSObject
     public func take(
         token: String, urlKey: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void)
     {
-        myLockerService.shareUrlKey(
+        MyLockerService().shareUrlKey(
             token: token,
             urlKey: urlKey,
             success: { myLocker in
