@@ -197,7 +197,7 @@ struct ListView: View {
             token: token,
             success: { myMaintenanceLockers in
                 AppControl.shared.hideLoading()
-                showingAlert = AlertItem.MyMaintenanceLockerGetSuccess(myLockers)
+                showingAlert = AlertItem.MyMaintenanceLockerGetSuccess(myMaintenanceLockers)
             },
             failure: failure
         )
