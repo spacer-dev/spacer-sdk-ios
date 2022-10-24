@@ -1,25 +1,23 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "Alamofire",
-        "repositoryURL": "https://github.com/Alamofire/Alamofire.git",
-        "state": {
-          "branch": null,
-          "revision": "f96b619bcb2383b43d898402283924b80e2c4bae",
-          "version": "5.4.3"
-        }
-      },
-      {
-        "package": "SpacerSDK",
-        "repositoryURL": "https://github.com/spacer-dev/spacer-sdk-ios.git",
-        "state": {
-          "branch": "a-sw/a-sw-dev",
-          "revision": "03d0d02fbdbdaaa7a182d75eec9713d37f0ab886",
-          "version": null
-        }
+  "pins" : [
+    {
+      "identity" : "alamofire",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Alamofire/Alamofire.git",
+      "state" : {
+        "revision" : "f96b619bcb2383b43d898402283924b80e2c4bae",
+        "version" : "5.4.3"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "spacer-sdk-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/spacer-dev/spacer-sdk-ios.git",
+      "state" : {
+        "branch" : "a-sw/a-sw-dev",
+        "revision" : "9a3b1bfc1cdeb2c98e401a5809ff8b8d29471f60"
+      }
+    }
+  ],
+  "version" : 2
 }

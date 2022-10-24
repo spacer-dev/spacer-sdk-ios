@@ -38,6 +38,9 @@ struct ListView: View {
                         InputItemView(
                             title: Strings.CBLockerTakeWithKeyTitle, desc: Strings.CBLockerTakeWithKeyDesc, textHint: Strings.CBLockerTakeWithKeyTextHint, runnable: takeWithKey
                         )
+                        InputItemView(
+                            title: Strings.CBOpenForMaintenanceTitle, desc: Strings.CBOpenForMaintenanceDesc, textHint: Strings.CBOpenForMaintenanceTextHint, runnable: openForMaintenance
+                        )
                     }
                     .padding()
                 }
@@ -62,6 +65,9 @@ struct ListView: View {
                         )
                         InputItemView(
                             title: Strings.MyLockerShareUrlKeyTitle, desc: Strings.MyLockerShareUrlKeyDesc, textHint: Strings.MyLockerShareUrlKeyTextHint, runnable: shareUrlKey
+                        )
+                        SimpleItemView(
+                            title: Strings.MyMaintenanceLockerGetTitle, desc: Strings.MyMaintenanceLockerGetDesc, runnable: getMyMaintenanceLocker
                         )
                     }
                     .padding()
@@ -142,6 +148,20 @@ struct ListView: View {
             failure: failure
         )
     }
+    
+    private func openForMaintenance(spacerId: String) {
+        AppControl.shared.showLoading()
+
+        cbLockerService.openForMaintenance(
+            token: token,
+            spacerId: spacerId,
+            success: {
+                AppControl.shared.hideLoading()
+                showingAlert = AlertItem.CBLockerOpenForMaintenanceSuccess(spacerId)
+            },
+            failure: failure
+        )
+    }
 
     private func takeWithKey(urlKey: String) {
         AppControl.shared.showLoading()
@@ -168,6 +188,20 @@ struct ListView: View {
             },
             failure: failure
         )
+    }
+    
+    private func getMyMaintenanceLocker() {
+        AppControl.shared.showLoading()
+        
+        myLockerService.getMyMaintenanceLocker(
+            token: token,
+            success: { myMaintenanceLockers in
+                AppControl.shared.hideLoading()
+                showingAlert = AlertItem.MyMaintenanceLockerGetSuccess(myLockers)
+            },
+            failure: failure
+        )
+
     }
 
     private func reserve(spacerId: String) {

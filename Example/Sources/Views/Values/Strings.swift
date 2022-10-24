@@ -35,6 +35,11 @@ class Strings {
     static let CBLockerTakeDesc = "connect to locker with bluetooth and take luggage from locker."
     static let CBLockerTakeTextHint = "enter spacer id"
     static let CBLockerTakeSuccessTitle = "succeeded in taking"
+    
+    static let CBOpenForMaintenanceTitle = "open for maintenance from locker"
+    static let CBOpenForMaintenanceDesc = "connect to locker with bluetooth and open for maintenance from locker."
+    static let CBOpenForMaintenanceTextHint = "enter spacer id"
+    static let CBOpenForMaintenanceSuccessTitle = "succeeded in opening"
 
     static let CBLockerTakeWithKeyTitle = "take from locker with url key"
     static let CBLockerTakeWithKeyDesc = "connect to locker with bluetooth and take luggage from locker with url key."
@@ -42,6 +47,9 @@ class Strings {
 
     static let MyLockerGetTitle = "get my lockers"
     static let MyLockerGetDesc = "get a list of your lockers in use."
+    
+    static let MyMaintenanceLockerGetTitle = "get my maintenance lockers"
+    static let MyMaintenanceLockerGetDesc = "get a list of your maintenance lockers in use."
 
     static let MyLockerReserveTitle = "reserve locker"
     static let MyLockerReserveDesc = "reserve available locker."
