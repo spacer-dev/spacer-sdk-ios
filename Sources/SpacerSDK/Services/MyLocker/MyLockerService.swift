@@ -85,4 +85,23 @@ public class MyLockerService {
             },
             failure: failure)
     }
+    
+    /// Get a list of your maintenance lockers in use
+    /// - Parameters:
+    ///   - token: User token created on the server
+    ///   - success: Callback on success
+    ///   - failure: Callback on failure
+    public func getMyMaintenanceLocker(token: String, success: @escaping ([MyMaintenanceLockerModel]) -> Void, failure: @escaping (SPRError) -> Void) {
+        let reqData = MyMaintenanceLockerGetReqData()
+
+        API.post(
+            path: ApiPaths.myMaintenanceLockerGet,
+            token: token,
+            reqData: reqData,
+            success: { (response: MyMaintenanceLockerGetResData) in
+                let myMaintenanceLockers = response.myMaintenanceLockers?.map { $0.toModel() } ?? []
+                success(myMaintenanceLockers)
+            },
+            failure: failure)
+    }
 }

@@ -48,6 +48,18 @@ public class CBLockerService: NSObject
     {
         centralConnectService.take(token: token, spacerId: spacerId, success: success, failure: failure)
     }
+    
+    /// Connect to a peripheral device. To open luggage from your maintenance locker
+    /// - Parameters:
+    ///   - token: User token created on the server
+    ///   - spacerId: Locker ID. ex) SPACER055
+    ///   - success: Callback on success
+    ///   - failure: Callback on failure
+    public func openForMaintenance(
+        token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void)
+    {
+        centralConnectService.openForMaintenance(token: token, spacerId: spacerId, success: success, failure: failure)
+    }
 
     /// Connect to take luggage from locker with shared key
     /// - Parameters:
