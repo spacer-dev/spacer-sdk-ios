@@ -33,6 +33,10 @@ struct AlertItem: Identifiable {
     static func CBLockerTakeSuccess(_ spacerId: String) -> AlertItem {
         AlertItem(title: "succeeded in taking from \(spacerId)")
     }
+    
+    static func CBLockerOpenForMaintenanceSuccess(_ spacerId: String) -> AlertItem {
+        AlertItem(title: "succeeded in opening from \(spacerId)")
+    }
 
     static func CBLockerTakeWithKeySuccess(_ urlKey: String) -> AlertItem {
         AlertItem(title: "succeeded in taking with \(urlKey)")
@@ -41,6 +45,11 @@ struct AlertItem: Identifiable {
     static func MyLockerGetSuccess(_ myLockers: [MyLockerModel]) -> AlertItem {
         let text = myLockers.map { $0.description }.joined(separator: "\n")
         return AlertItem(title: "succeeded in getting myLockers", message: "\(text)")
+    }
+    
+    static func MyMaintenanceLockerGetSuccess(_ myMaintenanceLockers: [MyMaintenanceLockerModel]) -> AlertItem {
+        let text = myMaintenanceLockers.map { $0.description }.joined(separator: "\n")
+        return AlertItem(title: "succeeded in getting myMaintenanceLockers", message: "\(text)")
     }
 
     static func MyLockerReserveSuccess(_ spacerId: String, _ myLocker: MyLockerModel) -> AlertItem {

@@ -19,6 +19,7 @@ Provides locker operation using BLE
 - Scan lockers
 - Deposit your luggage in the locker
 - Take your luggage out of the locker
+- Temporarily unlock locker
 
 ### 2. My Locker Service
 
@@ -28,6 +29,7 @@ Provides operation of the locker you are using
 - Reserve an available locker
 - Cancel the reserved locker
 - Share your locker in use
+- Get maintenance lockers in use
 
 ### 3. SPR Locker Service
 
@@ -99,6 +101,16 @@ cbLockerService.take(
     failure: { error in
     }
 )
+
+// Temporarily unlock locker
+cbLockerService.openForMaintenance(
+    token: token,
+    spacerId: spacerId,
+    success: {
+    },
+    failure: { error in
+    }
+)
 ```
 
 ### 2. My Locker Service
@@ -142,6 +154,15 @@ myLockerService.shareUrlKey(
     token: token,
     urlKey: urlKey,
     success: { myLocker in
+    },
+    failure: { error in
+    }
+)
+
+// Get maintenance lockers in use
+myLockerService.getMyMaintenanceLocker(
+    token: token,
+    success: { myMaintenanceLockers in
     },
     failure: { error in
     }
