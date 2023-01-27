@@ -14,24 +14,28 @@ protocol CBLockerPeripheralDelegate {
 }
 
 class CBLockerPeripheralService: NSObject {
-    private var locker: CBLockerModel!
+    private var type: CBLockerActionType
+    private var locker: CBLockerModel
     private let delegate: CBLockerPeripheralDelegate
-    private let skipFirstRead: Bool
+    private let isRetry: Bool
     private var success: () -> Void = {}
     private var failure: (SPRError) -> Void = { _ in }
     private var isCanceled = false
     private var timeouts: CBLockerConnectTimeouts!
 
-    init(locker: CBLockerModel, delegate: CBLockerPeripheralDelegate, skipFirstRead: Bool, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+    init(type: CBLockerActionType, locker: CBLockerModel, delegate: CBLockerPeripheralDelegate, isRetry: Bool, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+        self.type = type
         self.locker = locker
         self.delegate = delegate
-        self.skipFirstRead = skipFirstRead
+        self.isRetry = isRetry
         self.success = success
         self.failure = failure
 
         super.init()
+
+        self.locker.resetToConnect()
         self.timeouts = CBLockerConnectTimeouts(executable: execTimeoutProcessing)
-        
+
         NSLog("CBLockerPeripheralService init")
     }
 
@@ -39,35 +43,47 @@ class CBLockerPeripheralService: NSObject {
         static func create(type: CBLockerActionType,
                            token: String,
                            locker: CBLockerModel,
+                           isRetry: Bool,
                            success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) -> CBLockerPeripheralService?
         {
             if type == .put {
-                return CBLockerPeripheralPutService(token: token, locker: locker, success: success, failure: failure).peripheralDelegate
+                return CBLockerPeripheralPutService(type: type, token: token, locker: locker, isRetry: isRetry, success: success, failure: failure).peripheralDelegate
             } else if type == .take {
-                return CBLockerPeripheralTakeService(token: token, locker: locker, success: success, failure: failure).peripheralDelegate
+                return CBLockerPeripheralTakeService(type: type, token: token, locker: locker, isRetry: isRetry, success: success, failure: failure).peripheralDelegate
             }
             return nil
         }
     }
 
+    private func alreadyWrittenToCharacteristic(locker: CBLockerModel) -> Bool {
+        if type == .put {
+            // true: ('using','rwsuccess','wsuccess'), false: '2478699286901811'
+            return CBLockerConst.UsingOrWriteReadData.contains(locker.readData)
+        } else if type == .take {
+            // true: ('2478699286901811','rwsuccess','wsuccess'), false: ('using')
+            return !CBLockerConst.UsingReadData.contains(locker.readData)
+        }
+        return false
+    }
+
     func startConnectingAndDiscoveringServices() {
         timeouts.during.set()
         timeouts.start.set()
-        
+
         NSLog("CBLockerPeripheralService startConnectingAndDiscoveringServices")
     }
 
     private func finishConnectingAndDiscoveringServices() {
         NSLog("CBLockerPeripheralService finishConnectingAndDiscoveringServices")
-        
+
         timeouts.start.clear()
     }
 
     private func startDiscoveringCharacteristics(peripheral: CBPeripheral, services: [CBService]) {
         timeouts.discover.set()
-        
+
         NSLog("CBLockerPeripheralService startDiscoveringCharacteristics")
-        
+
         for service in services {
             print(service)
             peripheral.discoverCharacteristics([CBLockerConst.CharacteristicUUID], for: service)
@@ -76,7 +92,7 @@ class CBLockerPeripheralService: NSObject {
 
     private func finishDiscoveringCharacteristics() {
         NSLog("CBLockerPeripheralService finishDiscoveringCharacteristics")
-        
+
         timeouts.discover.clear()
     }
 
@@ -86,15 +102,15 @@ class CBLockerPeripheralService: NSObject {
         } else if locker.status == .write {
             timeouts.readAfterWrite.set()
         }
-        
+
         NSLog("CBLockerPeripheralService startReadingValueFromCharacteristic")
-        
+
         peripheral.readValue(for: characteristic)
     }
 
     private func finishReadingValueFromCharacteristic() {
         NSLog("CBLockerPeripheralService finishReadingValueFromCharacteristic")
-        
+
         if locker.status == .none {
             timeouts.readBeforeWrite.clear()
         } else if locker.status == .write {
@@ -104,7 +120,7 @@ class CBLockerPeripheralService: NSObject {
 
     private func startGettingKey(peripheral: CBPeripheral, characteristic: CBCharacteristic) {
         NSLog("CBLockerPeripheralService startGettingKey")
-        
+
         delegate.getKey(
             locker: locker,
             success: { data in self.startWritingValueToCharacteristic(peripheral: peripheral, characteristic: characteristic, data: data) },
@@ -113,21 +129,21 @@ class CBLockerPeripheralService: NSObject {
 
     private func startWritingValueToCharacteristic(peripheral: CBPeripheral, characteristic: CBCharacteristic, data: Data) {
         timeouts.write.set()
-        
+
         NSLog("CBLockerPeripheralService startWritingValueToCharacteristic")
-        
+
         peripheral.writeValue(data, for: characteristic, type: .withResponse)
     }
 
     private func finishWritingValueToCharacteristic() {
         NSLog("CBLockerPeripheralService finishWritingValueToCharacteristic")
-        
+
         timeouts.write.clear()
     }
 
     private func startSavingKey() {
         NSLog("CBLockerPeripheralService startSavingKey")
-        
+
         delegate.saveKey(locker: locker,
                          success: successIfNotCanceled,
                          failure: failureIfNotCanceled)
@@ -135,13 +151,13 @@ class CBLockerPeripheralService: NSObject {
 
     private func execTimeoutProcessing(error: SPRError) {
         NSLog("CBLockerPeripheralService execTimeoutProcessing")
-        
+
         failureIfNotCanceled(error)
     }
 
     private func successIfNotCanceled() {
         NSLog("CBLockerPeripheralService successIfNotCanceled")
-        
+
         if !isCanceled {
             isCanceled = true
             clearConnecting()
@@ -151,17 +167,17 @@ class CBLockerPeripheralService: NSObject {
 
     private func failureIfNotCanceled(_ error: SPRError) {
         NSLog("CBLockerPeripheralService failureIfNotCanceled")
-        
+
         if !isCanceled {
             isCanceled = true
             clearConnecting()
             failure(error)
         }
     }
-    
+
     private func clearConnecting() {
         NSLog("CBLockerPeripheralService clearConnecting")
-        
+
         timeouts.clearAll()
     }
 }
@@ -205,11 +221,7 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
             return failureIfNotCanceled(SPRError.CBCharacteristicNotFound)
         }
 
-        if skipFirstRead {
-            startGettingKey(peripheral: peripheral, characteristic: characteristic)
-        } else {
-            startReadingValueFromCharacteristic(peripheral: peripheral, characteristic: characteristic)
-        }
+        startReadingValueFromCharacteristic(peripheral: peripheral, characteristic: characteristic)
     }
 
     public func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
@@ -230,10 +242,14 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
         locker.setReadData(String(bytes: characteristicValue, encoding: String.Encoding.ascii) ?? "")
         print("peripheral didUpdateValueFor, read data: \(locker.readData), status: \(locker.status)")
 
-        if locker.status == .none {
-            startGettingKey(peripheral: peripheral, characteristic: characteristic)
-        } else if locker.status == .write {
+        if isRetry, alreadyWrittenToCharacteristic(locker: locker) {
             startSavingKey()
+        } else {
+            if locker.status == .none {
+                startGettingKey(peripheral: peripheral, characteristic: characteristic)
+            } else if locker.status == .write {
+                startSavingKey()
+            }
         }
     }
 

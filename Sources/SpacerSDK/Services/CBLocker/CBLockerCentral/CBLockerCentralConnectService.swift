@@ -11,7 +11,7 @@ import Foundation
 class CBLockerCentralConnectService: NSObject {
     private var token: String!
     private var spacerId: String!
-    private var action: CBLockerActionType!
+    private var type: CBLockerActionType!
     private var connectable: (CBLockerModel) -> Void = { _ in }
     private var success: () -> Void = {}
     private var failure: (SPRError) -> Void = { _ in }
@@ -37,7 +37,7 @@ class CBLockerCentralConnectService: NSObject {
         
         self.token = token
         self.spacerId = spacerId
-        self.action = .put
+        self.type = .put
         self.connectable = { locker in self.connectWithRetry(locker: locker) }
         self.success = success
         self.failure = failure
@@ -50,7 +50,7 @@ class CBLockerCentralConnectService: NSObject {
         
         self.token = token
         self.spacerId = spacerId
-        self.action = .take
+        self.type = .take
         self.connectable = { locker in self.connectWithRetry(locker: locker) }
         self.success = success
         self.failure = failure
@@ -65,7 +65,7 @@ class CBLockerCentralConnectService: NSObject {
         
         let peripheralDelegate =
             CBLockerPeripheralService.Factory.create(
-                type: action, token: token, locker: locker, success: {
+                type: type, token: token, locker: locker, isRetry: retryNum > 0, success: {
                     self.success()
                     self.disconnect(locker: locker)
                 },
@@ -107,7 +107,6 @@ class CBLockerCentralConnectService: NSObject {
 
 extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     func execAfterDiscovered(locker: CBLockerModel) {
-        
         NSLog("CBLockerCentralConnectService execAfterDiscovered")
         
         if locker.id == spacerId {
@@ -117,7 +116,6 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     }
     
     func execAfterScanning(lockers: [CBLockerModel]) {
-        
         NSLog("CBLockerCentralConnectService execAfterScanning")
         
         if centralService?.isScanning == true {
@@ -127,7 +125,6 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     }
     
     func successIfNotCanceled(locker: CBLockerModel) {
-        
         NSLog("CBLockerCentralConnectService successIfNotCanceled")
         
         centralService?.stopScan()
@@ -139,7 +136,6 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     }
 
     func failureIfNotCanceled(_ error: SPRError) {
-        
         NSLog("CBLockerCentralConnectService failureIfNotCanceled")
         
         centralService?.stopScan()

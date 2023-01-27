@@ -25,4 +25,9 @@ public struct CBLockerModel: Identifiable {
     mutating func updateStatus(_ status: CBLockerStatus) {
         self.status = status
     }
+    
+    mutating func resetToConnect() {
+        self.readData = ""
+        self.status = .none
+    }
 }
