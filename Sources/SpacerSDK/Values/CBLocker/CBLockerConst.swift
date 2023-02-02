@@ -10,7 +10,8 @@ import Foundation
 
 public enum CBLockerConst {
     public static let ScanSeconds = SPR.config.scanSeconds
-    static let DelayDisconnectSeconds: Double = 2.5
+    public static let MaxRetryNum = SPR.config.maxRetryNum
+    static let DelayDisconnectSeconds: Double = 3.0
     static let ServiceUUID = CBUUID(string: "FF10")
     static let CharacteristicUUID = CBUUID(string: "FF11")
     static let AdvertisementName = "kCBAdvDataLocalName"
@@ -20,7 +21,6 @@ public enum CBLockerConst {
     static let WriteReadData = ["rwsuccess", "wsuccess"];
     static let UsingOrWriteReadData = UsingReadData + WriteReadData
     
-    static let MaxRetryNum = 8
     static let StartTimeoutSeconds = 5.0;
     static let DiscoverTimeoutSeconds = 5.0;
     static let ReadTimeoutSeconds = 5.0;
