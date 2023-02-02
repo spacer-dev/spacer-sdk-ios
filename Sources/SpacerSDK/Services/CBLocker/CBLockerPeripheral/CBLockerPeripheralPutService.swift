@@ -10,22 +10,27 @@ import Foundation
 
 class CBLockerPeripheralPutService: NSObject {
     private var token = String()
-    private var success: () -> Void = {}
-    private var failure: (SPRError) -> Void = { _ in }
-    private(set) var connectService: CBLockerPeripheralService?
+    private(set) var peripheralDelegate: CBLockerPeripheralService?
 
-    init(token: String, locker: CBLockerModel, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+    init(type: CBLockerActionType, token: String, locker: CBLockerModel, isRetry: Bool, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         super.init()
 
+        NSLog(" CBLockerPeripheralPutService init")
+
         self.token = token
-        self.success = success
-        self.failure = failure
-        connectService = CBLockerPeripheralService(locker: locker, delegate: self)
+        peripheralDelegate = CBLockerPeripheralService(type: type, locker: locker, delegate: self, isRetry: isRetry, success: success, failure: failure)
     }
 }
 
 extension CBLockerPeripheralPutService: CBLockerPeripheralDelegate {
-    func onGetKey(locker: CBLockerModel, success: @escaping (Data) -> Void, failure: @escaping (SPRError) -> Void) {
+    func alreadyWrittenToCharacteristic(readData: String) -> Bool {
+        // true: ('using','rwsuccess','wsuccess'), false: '2478699286901811'
+        return CBLockerConst.UsingOrWriteReadData.contains(readData)
+    }
+
+    func getKey(locker: CBLockerModel, success: @escaping (Data) -> Void, failure: @escaping (SPRError) -> Void) {
+        NSLog(" CBLockerPeripheralPutService getKey \(locker.id), \(locker.readData)")
+
         let reqData = KeyGenerateReqData(spacerId: locker.id, readData: locker.readData)
 
         API.post(
@@ -43,20 +48,18 @@ extension CBLockerPeripheralPutService: CBLockerPeripheralDelegate {
             failure: failure)
     }
 
-    func onSuccess(locker: CBLockerModel) {
+    func saveKey(locker: CBLockerModel, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         let reqData = KeyGenerateResultReqData(spacerId: locker.id, readData: locker.readData)
+
+        NSLog(" CBLockerPeripheralPutService saveKey \(locker.id) \(locker.readData)")
 
         API.post(
             path: ApiPaths.KeyGenerateResult,
             token: token,
             reqData: reqData,
             success: { (_: KeyGenerateResultResData) in
-                self.success()
+                success()
             },
             failure: failure)
-    }
-
-    func onFailure(_ error: SPRError) {
-        failure(error)
     }
 }
