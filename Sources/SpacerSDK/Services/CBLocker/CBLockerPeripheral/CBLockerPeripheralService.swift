@@ -59,10 +59,8 @@ class CBLockerPeripheralService: NSObject {
 
     private func alreadyWrittenToCharacteristic(locker: CBLockerModel) -> Bool {
         if type == .put {
-            // true: ('using','rwsuccess','wsuccess'), false: '2478699286901811'
             return CBLockerConst.UsingOrWriteReadData.contains(locker.readData)
         } else if type == .take {
-            // true: ('2478699286901811','rwsuccess','wsuccess'), false: ('using')
             return !CBLockerConst.UsingReadData.contains(locker.readData)
         } else if type == .openForMaintenance {
             return CBLockerConst.UsingOrWriteReadData.contains(locker.readData)

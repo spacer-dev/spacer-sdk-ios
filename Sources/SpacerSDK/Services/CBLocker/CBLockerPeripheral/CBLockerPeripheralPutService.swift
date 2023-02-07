@@ -24,7 +24,6 @@ class CBLockerPeripheralPutService: NSObject {
 
 extension CBLockerPeripheralPutService: CBLockerPeripheralDelegate {
     func alreadyWrittenToCharacteristic(readData: String) -> Bool {
-        // true: ('using','rwsuccess','wsuccess'), false: '2478699286901811'
         return CBLockerConst.UsingOrWriteReadData.contains(readData)
     }
 

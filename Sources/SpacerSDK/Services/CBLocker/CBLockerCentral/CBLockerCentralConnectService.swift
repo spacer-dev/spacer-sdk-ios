@@ -110,23 +110,6 @@ class CBLockerCentralConnectService: NSObject {
         }
     }
     
-//    private func openForMaintenance(token: String, locker: CBLockerModel, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
-//        guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
-//
-//        let maintenanceService = CBLockerPeripheralMaintenanceService(
-//            token: token,
-//            locker: locker) {
-//                success()
-//                self.disconnect(locker: locker)
-//            } failure: { error in
-//                failure(error)
-//                self.disconnect(locker: locker)
-//            }
-//
-//        locker.peripheral?.delegate = maintenanceService.connectService
-//        self.centralService?.connect(peripheral: peripheral)
-//    }
-    
     private func disconnect(locker: CBLockerModel) {
         guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
         
