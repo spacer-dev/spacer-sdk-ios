@@ -23,10 +23,6 @@ class CBLockerPeripheralPutService: NSObject {
 }
 
 extension CBLockerPeripheralPutService: CBLockerPeripheralDelegate {
-    func alreadyWrittenToCharacteristic(readData: String) -> Bool {
-        return CBLockerConst.UsingOrWriteReadData.contains(readData)
-    }
-
     func getKey(locker: CBLockerModel, success: @escaping (Data) -> Void, failure: @escaping (SPRError) -> Void) {
         NSLog(" CBLockerPeripheralPutService getKey \(locker.id), \(locker.readData)")
 
