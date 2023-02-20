@@ -63,7 +63,7 @@ class CBLockerPeripheralService: NSObject {
         } else if type == .take {
             return !CBLockerConst.UsingReadData.contains(locker.readData)
         } else if type == .openForMaintenance {
-            return CBLockerConst.UsingOrWriteReadData.contains(locker.readData)
+            return locker.status == .write
         }
         return false
     }
