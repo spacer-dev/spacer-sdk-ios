@@ -14,18 +14,14 @@ class CBLockerPeripheralPutService: NSObject {
 
     init(type: CBLockerActionType, token: String, locker: CBLockerModel, isRetry: Bool, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         super.init()
-
-        NSLog(" CBLockerPeripheralPutService init")
-
         self.token = token
+
         peripheralDelegate = CBLockerPeripheralService(type: type, locker: locker, delegate: self, isRetry: isRetry, success: success, failure: failure)
     }
 }
 
 extension CBLockerPeripheralPutService: CBLockerPeripheralDelegate {
     func getKey(locker: CBLockerModel, success: @escaping (Data) -> Void, failure: @escaping (SPRError) -> Void) {
-        NSLog(" CBLockerPeripheralPutService getKey \(locker.id), \(locker.readData)")
-
         let reqData = KeyGenerateReqData(spacerId: locker.id, readData: locker.readData)
 
         API.post(
@@ -45,8 +41,6 @@ extension CBLockerPeripheralPutService: CBLockerPeripheralDelegate {
 
     func saveKey(locker: CBLockerModel, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         let reqData = KeyGenerateResultReqData(spacerId: locker.id, readData: locker.readData)
-
-        NSLog(" CBLockerPeripheralPutService saveKey \(locker.id) \(locker.readData)")
 
         API.post(
             path: ApiPaths.KeyGenerateResult,

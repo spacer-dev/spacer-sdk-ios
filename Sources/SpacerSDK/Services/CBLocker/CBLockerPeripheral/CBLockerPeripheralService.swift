@@ -35,8 +35,6 @@ class CBLockerPeripheralService: NSObject {
 
         self.locker.resetToConnect()
         self.timeouts = CBLockerConnectTimeouts(executable: execTimeoutProcessing)
-
-        NSLog("CBLockerPeripheralService init")
     }
 
     enum Factory {
@@ -71,20 +69,14 @@ class CBLockerPeripheralService: NSObject {
     func startConnectingAndDiscoveringServices() {
         timeouts.during.set()
         timeouts.start.set()
-
-        NSLog("CBLockerPeripheralService startConnectingAndDiscoveringServices")
     }
 
     private func finishConnectingAndDiscoveringServices() {
-        NSLog("CBLockerPeripheralService finishConnectingAndDiscoveringServices")
-
         timeouts.start.clear()
     }
 
     private func startDiscoveringCharacteristics(peripheral: CBPeripheral, services: [CBService]) {
         timeouts.discover.set()
-
-        NSLog("CBLockerPeripheralService startDiscoveringCharacteristics")
 
         for service in services {
             print(service)
@@ -93,8 +85,6 @@ class CBLockerPeripheralService: NSObject {
     }
 
     private func finishDiscoveringCharacteristics() {
-        NSLog("CBLockerPeripheralService finishDiscoveringCharacteristics")
-
         timeouts.discover.clear()
     }
 
@@ -104,15 +94,11 @@ class CBLockerPeripheralService: NSObject {
         } else if locker.status == .write {
             timeouts.readAfterWrite.set()
         }
-
-        NSLog("CBLockerPeripheralService startReadingValueFromCharacteristic")
-
+        
         peripheral.readValue(for: characteristic)
     }
 
     private func finishReadingValueFromCharacteristic() {
-        NSLog("CBLockerPeripheralService finishReadingValueFromCharacteristic")
-
         if locker.status == .none {
             timeouts.readBeforeWrite.clear()
         } else if locker.status == .write {
@@ -121,8 +107,6 @@ class CBLockerPeripheralService: NSObject {
     }
 
     private func startGettingKey(peripheral: CBPeripheral, characteristic: CBCharacteristic) {
-        NSLog("CBLockerPeripheralService startGettingKey")
-
         delegate.getKey(
             locker: locker,
             success: { data in self.startWritingValueToCharacteristic(peripheral: peripheral, characteristic: characteristic, data: data) },
@@ -132,34 +116,24 @@ class CBLockerPeripheralService: NSObject {
     private func startWritingValueToCharacteristic(peripheral: CBPeripheral, characteristic: CBCharacteristic, data: Data) {
         timeouts.write.set()
 
-        NSLog("CBLockerPeripheralService startWritingValueToCharacteristic")
-
         peripheral.writeValue(data, for: characteristic, type: .withResponse)
     }
 
     private func finishWritingValueToCharacteristic() {
-        NSLog("CBLockerPeripheralService finishWritingValueToCharacteristic")
-
         timeouts.write.clear()
     }
 
     private func startSavingKey() {
-        NSLog("CBLockerPeripheralService startSavingKey")
-
         delegate.saveKey(locker: locker,
                          success: successIfNotCanceled,
                          failure: failureIfNotCanceled)
     }
 
     private func execTimeoutProcessing(error: SPRError) {
-        NSLog("CBLockerPeripheralService execTimeoutProcessing")
-
         failureIfNotCanceled(error)
     }
 
     private func successIfNotCanceled() {
-        NSLog("CBLockerPeripheralService successIfNotCanceled")
-
         if !isCanceled {
             isCanceled = true
             clearConnecting()
@@ -168,8 +142,6 @@ class CBLockerPeripheralService: NSObject {
     }
 
     private func failureIfNotCanceled(_ error: SPRError) {
-        NSLog("CBLockerPeripheralService failureIfNotCanceled")
-
         if !isCanceled {
             isCanceled = true
             clearConnecting()
@@ -178,8 +150,6 @@ class CBLockerPeripheralService: NSObject {
     }
 
     private func clearConnecting() {
-        NSLog("CBLockerPeripheralService clearConnecting")
-
         timeouts.clearAll()
     }
 }

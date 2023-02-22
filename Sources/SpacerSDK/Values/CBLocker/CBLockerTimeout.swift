@@ -21,9 +21,7 @@ class CBLockerTimeout {
     }
 
     func set() {
-        NSLog("CBLockerTimeout set \(name)")
         workItem = DispatchWorkItem {
-            NSLog("CBLockerTimeout exec \(self.name)")
             self.executable(self.error)
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + seconds, execute: workItem!)
@@ -31,7 +29,6 @@ class CBLockerTimeout {
 
     func clear() {
         workItem?.cancel()
-        NSLog("CBLockerTimeout clear \(name)")
     }
 }
 

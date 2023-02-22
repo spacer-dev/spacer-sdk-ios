@@ -14,9 +14,6 @@ class CBLockerPeripheralTakeService: NSObject {
 
     init(type: CBLockerActionType, token: String, locker: CBLockerModel, isRetry: Bool, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         super.init()
-
-        NSLog(" CBLockerPeripheralTakeService init")
-
         self.token = token
         peripheralDelegate = CBLockerPeripheralService(type: type, locker: locker, delegate: self, isRetry: isRetry, success: success, failure: failure)
     }
@@ -24,8 +21,6 @@ class CBLockerPeripheralTakeService: NSObject {
 
 extension CBLockerPeripheralTakeService: CBLockerPeripheralDelegate {
     func getKey(locker: CBLockerModel, success: @escaping (Data) -> Void, failure: @escaping (SPRError) -> Void) {
-        NSLog(" CBLockerPeripheralTakeService getKey \(locker.id) \(locker.readData)")
-
         let reqData = KeyGetReqData(spacerId: locker.id)
 
         API.post(
@@ -44,8 +39,6 @@ extension CBLockerPeripheralTakeService: CBLockerPeripheralDelegate {
     }
 
     func saveKey(locker: CBLockerModel, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
-        NSLog(" CBLockerPeripheralTakeService saveKey \(locker.id) \(locker.readData)")
-
         let reqData = KeyGetResultReqData(spacerId: locker.id, readData: locker.readData)
 
         API.post(

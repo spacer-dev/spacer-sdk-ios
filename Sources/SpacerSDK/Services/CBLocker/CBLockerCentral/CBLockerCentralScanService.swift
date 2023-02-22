@@ -18,13 +18,11 @@ class CBLockerCentralScanService: NSObject {
     private var isCanceled = false
 
     override init() {
-        NSLog(" CBLockerCentralScanService init")
         super.init()
         self.centralService = CBLockerCentralService(delegate: self)
     }
 
     func scan(token: String, success: @escaping ([SPRLockerModel]) -> Void, failure: @escaping (SPRError) -> Void) {
-        NSLog(" CBLockerCentralScanService scan")
         self.token = token
         self.success = success
         centralService?.startScan()
@@ -44,13 +42,11 @@ extension CBLockerCentralScanService: CBLockerCentralDelegate {
     func execAfterDiscovered(locker: CBLockerModel) {}
 
     func execAfterScanning(lockers: [CBLockerModel]) {
-        NSLog(" CBLockerCentralScanService execAfterScanning")
         centralService?.stopScan()
         convertSprLockers(lockers: lockers)
     }
 
     func successIfNotCanceled(sprLockers: [SPRLockerModel]) {
-        NSLog(" CBLockerCentralScanService successIfNotCanceled")
         centralService?.stopScan()
 
         if !isCanceled {
@@ -60,7 +56,6 @@ extension CBLockerCentralScanService: CBLockerCentralDelegate {
     }
 
     func failureIfNotCanceled(_ error: SPRError) {
-        NSLog(" CBLockerCentralScanService failureIfNotCanceled: \(error.message)")
         centralService?.stopScan()
 
         if !isCanceled {

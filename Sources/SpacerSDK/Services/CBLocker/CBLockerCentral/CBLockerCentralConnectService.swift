@@ -20,21 +20,15 @@ class CBLockerCentralConnectService: NSObject {
     private var isCanceled = false
     
     override init() {
-        NSLog("CBLockerCentralConnectService init")
-
         super.init()
         self.centralService = CBLockerCentralService(delegate: self)
     }
     
     private func scan() {
-        NSLog("CBLockerCentralConnectService scan")
-        
         centralService?.startScan()
     }
     
     func put(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
-        NSLog("CBLockerCentralConnectService put")
-
         self.token = token
         self.spacerId = spacerId
         self.type = .put
@@ -46,8 +40,6 @@ class CBLockerCentralConnectService: NSObject {
     }
     
     func take(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
-        NSLog("CBLockerCentralConnectService take")
-
         self.token = token
         self.spacerId = spacerId
         self.type = .take
@@ -59,8 +51,6 @@ class CBLockerCentralConnectService: NSObject {
     }
     
     func openForMaintenance(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
-        NSLog("CBLockerCentralConnectService openForMaintenance")
-        
         self.token = token
         self.spacerId = spacerId
         self.type = .openForMaintenance
@@ -73,9 +63,6 @@ class CBLockerCentralConnectService: NSObject {
     
     private func connectWithRetry(locker: CBLockerModel, retryNum: Int = 0) {
         guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
-        
-        NSLog("@@@@ connect peripheral retryNum:\(retryNum)")
-
         let peripheralDelegate =
             CBLockerPeripheralService.Factory.create(
                 type: type, token: token, locker: locker, isRetry: retryNum > 0, success: {
@@ -100,8 +87,6 @@ class CBLockerCentralConnectService: NSObject {
     }
     
     private func retryOrFailure(error: SPRError, locker: CBLockerModel, retryNum: Int, executable: @escaping () -> Void) {
-        NSLog("@@@@ retry or failure retryNum:\(retryNum), error: \(error.message)")
-        
         if retryNum < CBLockerConst.MaxRetryNum {
             executable()
         } else {
@@ -112,16 +97,12 @@ class CBLockerCentralConnectService: NSObject {
     
     private func disconnect(locker: CBLockerModel) {
         guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
-        
-        NSLog("CBLockerCentralConnectService disconnect")
         centralService?.disconnect(peripheral: peripheral)
     }
 }
 
 extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     func execAfterDiscovered(locker: CBLockerModel) {
-        NSLog("CBLockerCentralConnectService execAfterDiscovered")
-
         if locker.id == spacerId {
             centralService?.stopScan()
             successIfNotCanceled(locker: locker)
@@ -129,8 +110,6 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     }
     
     func execAfterScanning(lockers: [CBLockerModel]) {
-        NSLog("CBLockerCentralConnectService execAfterScanning")
-
         if centralService?.isScanning == true {
             centralService?.stopScan()
             failureIfNotCanceled(SPRError.CBCentralTimeout)
@@ -138,8 +117,6 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     }
     
     func successIfNotCanceled(locker: CBLockerModel) {
-        NSLog("CBLockerCentralConnectService successIfNotCanceled")
-
         centralService?.stopScan()
 
         if !isCanceled {
@@ -149,8 +126,6 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     }
 
     func failureIfNotCanceled(_ error: SPRError) {
-        NSLog("CBLockerCentralConnectService failureIfNotCanceled")
-
         centralService?.stopScan()
 
         if !isCanceled {
