@@ -29,21 +29,21 @@ class Strings {
 
     static let CBLockerPutTitle = "put in locker"
     static let CBLockerPutDesc = "connect to locker with bluetooth and put your luggage in locker."
-    static let CBLockerPutTextHint = "enter spacer id"
+    static let CBLockerPutTextHint = "spacer id"
 
     static let CBLockerTakeTitle = "take from locker"
     static let CBLockerTakeDesc = "connect to locker with bluetooth and take luggage from locker."
-    static let CBLockerTakeTextHint = "enter spacer id"
+    static let CBLockerTakeTextHint = "spacer id"
     static let CBLockerTakeSuccessTitle = "succeeded in taking"
     
     static let CBOpenForMaintenanceTitle = "open for maintenance from locker"
     static let CBOpenForMaintenanceDesc = "connect to locker with bluetooth and open for maintenance from locker."
-    static let CBOpenForMaintenanceTextHint = "enter spacer id"
+    static let CBOpenForMaintenanceTextHint = "spacer id"
     static let CBOpenForMaintenanceSuccessTitle = "succeeded in opening"
 
     static let CBLockerTakeWithKeyTitle = "take from locker with url key"
     static let CBLockerTakeWithKeyDesc = "connect to locker with bluetooth and take luggage from locker with url key."
-    static let CBLockerTakeWithKeyTextHint = "enter url key"
+    static let CBLockerTakeWithKeyTextHint = "url key"
 
     static let MyLockerGetTitle = "get my lockers"
     static let MyLockerGetDesc = "get a list of your lockers in use."
@@ -53,25 +53,25 @@ class Strings {
 
     static let MyLockerReserveTitle = "reserve locker"
     static let MyLockerReserveDesc = "reserve available locker."
-    static let MyLockerReserveTextHint = "enter spacer id"
+    static let MyLockerReserveTextHint = "spacer id"
 
     static let MyLockerReserveCancelTitle = "cancel reservation"
     static let MyLockerReserveCancelDesc = "cancel locker you reserved."
-    static let MyLockerReserveCancelTextHint = "enter spacer id"
+    static let MyLockerReserveCancelTextHint = "spacer id"
 
     static let MyLockerShareUrlKeyTitle = "share locker"
     static let MyLockerShareUrlKeyDesc = "share locker with yourself using url key."
-    static let MyLockerShareUrlKeyTextHint = "enter url key"
+    static let MyLockerShareUrlKeyTextHint = "url key"
 
     static let SPRLockerGetTitle = "get lockers"
     static let SPRLockerGetDesc = "get multiple locker basic information."
-    static let SPRLockerGetTextHint = "enter spacer ids separated by commas"
+    static let SPRLockerGetTextHint = "spacer ids separated by commas"
 
     static let SPRUnitGetTitle = "get locker units"
     static let SPRUnitGetDesc = "get multiple locker unit basic information."
-    static let SPRUnitGetTextHint = "enter unit ids separated by commas"
+    static let SPRUnitGetTextHint = "unit ids separated by commas"
     
     static let SPRLocationGetTitle = "get location"
     static let SPRLocationGetDesc = "get multiple unit location basic information."
-    static let SPRLocationGetTextHint = "enter location id"
+    static let SPRLocationGetTextHint = "location id"
 }

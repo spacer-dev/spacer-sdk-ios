@@ -10,22 +10,18 @@ import Foundation
 
 class CBLockerPeripheralPutService: NSObject {
     private var token = String()
-    private var success: () -> Void = {}
-    private var failure: (SPRError) -> Void = { _ in }
-    private(set) var connectService: CBLockerPeripheralService?
+    private(set) var peripheralDelegate: CBLockerPeripheralService?
 
-    init(token: String, locker: CBLockerModel, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+    init(type: CBLockerActionType, token: String, locker: CBLockerModel, isRetry: Bool, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         super.init()
-
         self.token = token
-        self.success = success
-        self.failure = failure
-        connectService = CBLockerPeripheralService(locker: locker, delegate: self)
+
+        peripheralDelegate = CBLockerPeripheralService(type: type, locker: locker, delegate: self, isRetry: isRetry, success: success, failure: failure)
     }
 }
 
 extension CBLockerPeripheralPutService: CBLockerPeripheralDelegate {
-    func onGetKey(locker: CBLockerModel, success: @escaping (Data) -> Void, failure: @escaping (SPRError) -> Void) {
+    func getKey(locker: CBLockerModel, success: @escaping (Data) -> Void, failure: @escaping (SPRError) -> Void) {
         let reqData = KeyGenerateReqData(spacerId: locker.id, readData: locker.readData)
 
         API.post(
@@ -43,7 +39,7 @@ extension CBLockerPeripheralPutService: CBLockerPeripheralDelegate {
             failure: failure)
     }
 
-    func onSuccess(locker: CBLockerModel) {
+    func saveKey(locker: CBLockerModel, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         let reqData = KeyGenerateResultReqData(spacerId: locker.id, readData: locker.readData)
 
         API.post(
@@ -51,12 +47,8 @@ extension CBLockerPeripheralPutService: CBLockerPeripheralDelegate {
             token: token,
             reqData: reqData,
             success: { (_: KeyGenerateResultResData) in
-                self.success()
+                success()
             },
             failure: failure)
-    }
-
-    func onFailure(_ error: SPRError) {
-        failure(error)
     }
 }

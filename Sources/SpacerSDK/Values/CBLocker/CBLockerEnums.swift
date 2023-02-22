@@ -7,7 +7,13 @@
 
 import Foundation
 
-enum CBLockerOperation {
+enum CBLockerActionType {
+    case put
+    case take
+    case openForMaintenance
+}
+
+enum CBLockerStatus {
     case none
     case read
     case write
