@@ -9,14 +9,13 @@ import CoreBluetooth
 import Foundation
 
 class CBLockerCentralScanService: NSObject {
-    private var sprLockerService = SPRLockerService()
-    private var centralService: CBLockerCentralService?
-
-    private var token = String()
+    private var token: String!
     private var success: ([SPRLockerModel]) -> Void = { _ in }
     private var failure: (SPRError) -> Void = { _ in }
 
-    private var lockers = [CBLockerModel]()
+    private var centralService: CBLockerCentralService?
+    private var sprLockerService = SPRLockerService()
+    private var isCanceled = false
 
     override init() {
         super.init()
@@ -26,35 +25,42 @@ class CBLockerCentralScanService: NSObject {
     func scan(token: String, success: @escaping ([SPRLockerModel]) -> Void, failure: @escaping (SPRError) -> Void) {
         self.token = token
         self.success = success
-        self.failure = failure
-
-        centralService?.scan()
-    }
-}
-
-extension CBLockerCentralScanService: CBLockerCentralDelegate {
-    func onDiscovered(locker: CBLockerModel) {
-        let index = lockers.firstIndex(where: { $0.peripheral?.identifier == locker.peripheral?.identifier })
-
-        if let index = index {
-            lockers[index] = locker
-        } else {
-            lockers.append(locker)
-        }
+        centralService?.startScan()
     }
 
-    func onDelayed() {
-        centralService?.stopScan()
-
+    private func convertSprLockers(lockers: [CBLockerModel]) {
         let spacerIds = lockers.map { $0.id }
         sprLockerService.get(
             token: token,
             spacerIds: spacerIds,
-            success: success,
-            failure: failure)
+            success: successIfNotCanceled,
+            failure: failureIfNotCanceled)
+    }
+}
+
+extension CBLockerCentralScanService: CBLockerCentralDelegate {
+    func execAfterDiscovered(locker: CBLockerModel) {}
+
+    func execAfterScanning(lockers: [CBLockerModel]) {
+        centralService?.stopScan()
+        convertSprLockers(lockers: lockers)
     }
 
-    func onFailure(_ error: SPRError) {
-        failure(error)
+    func successIfNotCanceled(sprLockers: [SPRLockerModel]) {
+        centralService?.stopScan()
+
+        if !isCanceled {
+            isCanceled = true
+            success(sprLockers)
+        }
+    }
+
+    func failureIfNotCanceled(_ error: SPRError) {
+        centralService?.stopScan()
+
+        if !isCanceled {
+            isCanceled = true
+            failure(error)
+        }
     }
 }
