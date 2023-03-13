@@ -46,9 +46,23 @@ class ApiClient {
     }
 
     private func createHeaders(_ token: String) -> HTTPHeaders {
+        if CBLockerConst.ApiType == .app {
+            return createAppHeaders(token)
+        }
+        return createExHeaders(token)
+    }
+    
+    private func createExHeaders(_ token: String) -> HTTPHeaders {
         return [
             "Contenttype": "application/json",
             "X-Spacer-ExApp-Token": token
+        ]
+    }
+    
+    private func createAppHeaders(_ token: String) -> HTTPHeaders {
+        return [
+            "Content-Type": "application/json",
+            "Authorization": "Bearer \(token)"
         ]
     }
 }
