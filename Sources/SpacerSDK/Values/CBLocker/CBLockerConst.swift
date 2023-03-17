@@ -11,7 +11,6 @@ import Foundation
 public enum CBLockerConst {
     public static let ScanSeconds = SPR.config.scanSeconds
     public static let MaxRetryNum = SPR.config.maxRetryNum
-    public static let ApiType = SPR.config.apiType
     static let DelayDisconnectSeconds: Double = 3.0
     static let ServiceUUID = CBUUID(string: "FF10")
     static let CharacteristicUUID = CBUUID(string: "FF11")

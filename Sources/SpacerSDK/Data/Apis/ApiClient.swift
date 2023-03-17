@@ -46,7 +46,7 @@ class ApiClient {
     }
 
     private func createHeaders(_ token: String) -> HTTPHeaders {
-        if CBLockerConst.ApiType == .app {
+        if ApiConst.ApiType == .app {
             return createAppHeaders(token)
         }
         return createExHeaders(token)
