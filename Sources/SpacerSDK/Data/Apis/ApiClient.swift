@@ -62,7 +62,8 @@ class ApiClient {
     private func createAppHeaders(_ token: String) -> HTTPHeaders {
         return [
             "Content-Type": "application/json",
-            "Authorization": "Bearer \(token)"
+            "Authorization": "Bearer \(token)",
+            "X-App-Type": "SDK"
         ]
     }
 }
