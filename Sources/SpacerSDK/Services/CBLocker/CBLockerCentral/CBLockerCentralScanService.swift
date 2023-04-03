@@ -25,6 +25,8 @@ class CBLockerCentralScanService: NSObject {
     func scan(token: String, success: @escaping ([SPRLockerModel]) -> Void, failure: @escaping (SPRError) -> Void) {
         self.token = token
         self.success = success
+        self.failure = failure
+        
         centralService?.startScan()
     }
 
