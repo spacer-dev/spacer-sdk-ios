@@ -14,4 +14,5 @@ struct SPRLockerResData: Codable {
     public var closedWait: String
     public var version: String
     public var doorStatus: String
+    public var doorStatusExpiredAt: String?
 }
