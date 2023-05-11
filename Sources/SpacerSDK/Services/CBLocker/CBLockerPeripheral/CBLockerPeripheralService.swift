@@ -234,6 +234,14 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
             print("peripheral didWriteValueFor failed with error: \(String(describing: error))")
             return failureIfNotCanceled(SPRError.CBWritingCharacteristicFailed)
         }
+        
+        guard let characteristicValue = characteristic.value else {
+            print("peripheral didUpdateValueFor, characteristic value is nil")
+            return failureIfNotCanceled(SPRError.CBReadingCharacteristicFailed)
+        }
+        
+        let readData = String(bytes: characteristicValue, encoding: String.Encoding.ascii) ?? ""
+        print("readData: \(readData)")
 
         locker.updateStatus(.write)
         startReadingValueFromCharacteristic(peripheral: peripheral, characteristic: characteristic)
