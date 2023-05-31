@@ -14,6 +14,7 @@ class CBLockerCentralConnectService: NSObject {
     private var type: CBLockerActionType!
     private var connectable: (CBLockerModel) -> Void = { _ in }
     private var success: () -> Void = {}
+    private var readSuccess: (String) -> Void = { _ in }
     private var failure: (SPRError) -> Void = { _ in }
     
     private var centralService: CBLockerCentralService?
@@ -61,6 +62,16 @@ class CBLockerCentralConnectService: NSObject {
         scan()
     }
     
+    func read(spacerId: String, success: @escaping (String) -> Void, failure: @escaping (SPRError) -> Void) {
+        self.spacerId = spacerId
+        self.type = .read
+        //self.connectable = {locker in self.connectWithRetryByRead(locker: locker, isRetry: false) }
+        self.readSuccess = success
+        self.failure = failure
+        
+        scan()
+    }
+    
     private func connectWithRetry(locker: CBLockerModel, retryNum: Int = 0) {
         guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
         let peripheralDelegate =
@@ -84,6 +95,23 @@ class CBLockerCentralConnectService: NSObject {
         locker.peripheral?.delegate = delegate
         delegate.startConnectingAndDiscoveringServices()
         centralService?.connect(peripheral: peripheral)
+    }
+    
+    private func connectWithRetryByRead(locker: CBLockerModel, retryNum: Int = 0) {
+        let cBLockerReadService = CBLockerReadService()
+        cBLockerReadService.connect(locker: locker) { readData in
+            self.readSuccess(readData)
+        } failure: { error in
+            self.retryOrFailure(
+                error: error,
+                locker: locker,
+                retryNum: retryNum + 1,
+                executable: { self.connectWithRetryByRead(locker: locker, retryNum: retryNum + 1) }
+            )
+        }
+
+        cBLockerReadService.startConnectingAndDiscoveringServices()
+        centralService?.startScan()
     }
     
     private func retryOrFailure(error: SPRError, locker: CBLockerModel, retryNum: Int, executable: @escaping () -> Void) {

@@ -41,6 +41,10 @@ struct AlertItem: Identifiable {
     static func CBLockerTakeWithKeySuccess(_ urlKey: String) -> AlertItem {
         AlertItem(title: "succeeded in taking with \(urlKey)")
     }
+    
+    static func CBLockerReadSuccess(_ readData: String) -> AlertItem {
+        AlertItem(title: "succeeded in reading", message: "\(readData)")
+    }
 
     static func MyLockerGetSuccess(_ myLockers: [MyLockerModel]) -> AlertItem {
         let text = myLockers.map { $0.description }.joined(separator: "\n")
