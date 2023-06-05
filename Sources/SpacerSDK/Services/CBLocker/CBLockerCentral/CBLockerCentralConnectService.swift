@@ -65,31 +65,31 @@ class CBLockerCentralConnectService: NSObject {
     func read(spacerId: String, success: @escaping (String) -> Void, failure: @escaping (SPRError) -> Void) {
         self.spacerId = spacerId
         self.type = .read
-        //self.connectable = {locker in self.connectWithRetryByRead(locker: locker, isRetry: false) }
+        self.connectable = { locker in self.connectWithRetryByRead(locker: locker) }
         self.readSuccess = success
         self.failure = failure
-        
+
         scan()
     }
-    
+
     private func connectWithRetry(locker: CBLockerModel, retryNum: Int = 0) {
         guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
         let peripheralDelegate =
-        CBLockerPeripheralService.Factory.create(
-            type: type, token: token, locker: locker, isRetry: retryNum > 0, success: {
-                self.success()
-                self.disconnect(locker: locker)
-            },
-            failure: { error in
-                self.retryOrFailure(
-                    error: error,
-                    locker: locker,
-                    retryNum: retryNum + 1,
-                    executable: { self.connectWithRetry(locker: locker, retryNum: retryNum + 1) }
-                )
-            }
-        )
-        ​
+            CBLockerPeripheralService.Factory.create(
+                type: type, token: token, locker: locker, isRetry: retryNum > 0, success: {
+                    self.success()
+                    self.disconnect(locker: locker)
+                },
+                failure: { error in
+                    self.retryOrFailure(
+                        error: error,
+                        locker: locker,
+                        retryNum: retryNum + 1,
+                        executable: { self.connectWithRetry(locker: locker, retryNum: retryNum + 1) }
+                    )
+                }
+            )
+
         guard let delegate = peripheralDelegate else { return failure(SPRError.CBConnectingFailed) }
 
         locker.peripheral?.delegate = delegate
@@ -100,23 +100,23 @@ class CBLockerCentralConnectService: NSObject {
     private func connectWithRetryByRead(locker: CBLockerModel, retryNum: Int = 0) {
         guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
         let peripheralDelegate =
-        CBLockerPeripheralReadService(
-            locker: locker, isRetry: retryNum > 0, success: { readData in
-                self.readSuccess(readData)
-                self.disconnect(locker: locker)
-            },
-            failure: { error in
-                self.retryOrFailure(
-                    error: error,
-                    locker: locker,
-                    retryNum: retryNum + 1,
-                    executable: { self.connectWithRetryByRead(locker: locker, retryNum: retryNum + 1) }
-                )
-            }
-        )
-        ​
+            CBLockerPeripheralReadService(
+                locker: locker, isRetry: retryNum > 0, success: { readData in
+                    self.readSuccess(readData)
+                    self.disconnect(locker: locker)
+                },
+                failure: { error in
+                    self.retryOrFailure(
+                        error: error,
+                        locker: locker,
+                        retryNum: retryNum + 1,
+                        executable: { self.connectWithRetryByRead(locker: locker, retryNum: retryNum + 1) }
+                    )
+                }
+            )
+
         let delegate = peripheralDelegate
-        ​
+
         locker.peripheral?.delegate = delegate
         delegate.startConnectingAndDiscoveringServices()
         centralService?.connect(peripheral: peripheral)
