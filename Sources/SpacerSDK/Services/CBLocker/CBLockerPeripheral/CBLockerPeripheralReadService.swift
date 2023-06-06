@@ -10,15 +10,13 @@ import Foundation
 
 class CBLockerPeripheralReadService: NSObject {
     private var locker: CBLockerModel
-    private let isRetry: Bool
     private var success: (String) -> Void = { _ in }
     private var failure: (SPRError) -> Void = { _ in }
     private var isCanceled = false
     private var timeouts: CBLockerConnectTimeouts!
 
-    init(locker: CBLockerModel, isRetry: Bool, success: @escaping (String) -> Void, failure: @escaping (SPRError) -> Void) {
+    init(locker: CBLockerModel, success: @escaping (String) -> Void, failure: @escaping (SPRError) -> Void) {
         self.locker = locker
-        self.isRetry = isRetry
         self.success = success
         self.failure = failure
 

@@ -101,7 +101,7 @@ class CBLockerCentralConnectService: NSObject {
         guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
         let peripheralDelegate =
             CBLockerPeripheralReadService(
-                locker: locker, isRetry: retryNum > 0, success: { readData in
+                locker: locker, success: { readData in
                     self.readSuccess(readData)
                     self.disconnect(locker: locker)
                 },
