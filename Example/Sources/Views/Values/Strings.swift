@@ -45,7 +45,7 @@ class Strings {
     static let CBLockerTakeWithKeyDesc = "connect to locker with bluetooth and take luggage from locker with url key."
     static let CBLockerTakeWithKeyTextHint = "url key"
     
-    static let CBLockerReadTitle = "read from locke"
+    static let CBLockerReadTitle = "read from locker"
     static let CBLockerReadDesc = "connect to locker with bluetooth and read characteristic."
     static let CBLockerReadHint = "spacer id"
     static let CBLockerReadSuccessTitle = "succeeded in reading"
