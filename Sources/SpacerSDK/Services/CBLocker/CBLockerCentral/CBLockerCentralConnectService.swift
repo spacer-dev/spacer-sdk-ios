@@ -145,11 +145,8 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
         }
     }
     
-    func execAfterScanning(lockers: [CBLockerModel]) {
-        if centralService?.isScanning == true {
-            centralService?.stopScan()
-            failureIfNotCanceled(SPRError.CBCentralTimeout)
-        }
+    func execAfterScanning(lockers: [CBLockerModel]) -> Bool {
+        return centralService?.isScanning == false
     }
     
     func successIfNotCanceled(locker: CBLockerModel) {
