@@ -1,5 +1,5 @@
 //
-//  CBLockerPeripheralReadService.swift
+//  CBLockerReadService.swift
 //  
 //
 //  Created by s.norimatsu on 2023/05/26.
@@ -7,36 +7,44 @@
 
 import CoreBluetooth
 import Foundation
-​
-class CBLockerPeripheralReadService: NSObject {
-    private var locker: CBLockerModel
-    private let isRetry: Bool
+
+class CBLockerReadService: NSObject {
+    private var locker: CBLockerModel!
+    private var centralManager: CBCentralManager!
+    private var peripheral: CBPeripheral?
+    private var isCanceled = false
     private var success: (String) -> Void = { _ in }
     private var failure: (SPRError) -> Void = { _ in }
-    private var isCanceled = false
     private var timeouts: CBLockerConnectTimeouts!
-​
-    init(locker: CBLockerModel, isRetry: Bool, success: @escaping (String) -> Void, failure: @escaping (SPRError) -> Void) {
+    
+    func connect(locker: CBLockerModel, success: @escaping (String) -> Void, failure: @escaping (SPRError) -> Void) {
+        print("connect: \(locker.id)")
+        
         self.locker = locker
-        self.isRetry = isRetry
         self.success = success
         self.failure = failure
-​
-        super.init()
-​
-        self.locker.resetToConnect()
-        self.timeouts = CBLockerConnectTimeouts(executable: execTimeoutProcessing)
+        
+        centralManager = CBCentralManager(delegate: self, queue: nil)
+    }
+    
+    private func reset() {
+        centralManager.cancelPeripheralConnection(peripheral!)
+        peripheral = nil
+    }
+    
+    private func successIfNotCanceled(readData: String) {
+        reset()
+        if (!isCanceled) {
+            isCanceled = true
+            success(readData)
+        }
     }
     
     func startConnectingAndDiscoveringServices() {
         timeouts.during.set()
         timeouts.start.set()
     }
-​
-    private func finishConnectingAndDiscoveringServices() {
-        timeouts.start.clear()
-    }
-​
+    
     private func startDiscoveringCharacteristics(peripheral: CBPeripheral, services: [CBService]) {
         timeouts.discover.set()
         
@@ -45,33 +53,13 @@ class CBLockerPeripheralReadService: NSObject {
             peripheral.discoverCharacteristics([CBLockerConst.CharacteristicUUID], for: service)
         }
     }
-​
-    private func finishDiscoveringCharacteristics() {
-        timeouts.discover.clear()
-    }
-​
+    
     private func startReadingValueFromCharacteristic(peripheral: CBPeripheral, characteristic: CBCharacteristic) {
         timeouts.readBeforeWrite.set()
         
         peripheral.readValue(for: characteristic)
     }
-​
-    private func finishReadingValueFromCharacteristic() {
-        timeouts.readBeforeWrite.clear()
-    }
-​
-    private func execTimeoutProcessing(error: SPRError) {
-        failureIfNotCanceled(error)
-    }
-​
-    private func successIfNotCanceled(readData: String) {
-        if !isCanceled {
-            isCanceled = true
-            clearConnecting()
-            success(readData)
-        }
-    }
-​
+    
     private func failureIfNotCanceled(_ error: SPRError) {
         if !isCanceled {
             isCanceled = true
@@ -79,16 +67,59 @@ class CBLockerPeripheralReadService: NSObject {
             failure(error)
         }
     }
-​
+    
+    private func finishReadingValueFromCharacteristic() {
+        timeouts.readBeforeWrite.clear()
+    }
+    
+    private func finishDiscoveringCharacteristics() {
+        timeouts.discover.clear()
+    }
+    
     private func clearConnecting() {
         timeouts.clearAll()
     }
+    
+    private func finishConnectingAndDiscoveringServices() {
+        timeouts.start.clear()
+    }
+    
+    private func execTimeoutProcessing(error: SPRError) {
+        failureIfNotCanceled(error)
+    }
 }
-​
-extension CBLockerPeripheralReadService: CBPeripheralDelegate {
-    public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-        print("peripheral didDiscoverServices")
-​
+
+// MARK: - CBCentralManagerDelegate
+
+extension CBLockerReadService: CBCentralManagerDelegate {
+    func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        let readyScan = central.state == .poweredOn && centralManager?.isScanning == false
+        if readyScan {
+            centralManager?.scanForPeripherals(withServices: [CBLockerConst.ServiceUUID], options: nil)
+        } else {
+            if let error = central.state.toSPRError() {
+                failureIfNotCanceled(error)
+            }
+        }
+    }
+    
+    func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
+        self.centralManager.stopScan()
+        self.peripheral = peripheral
+        self.peripheral?.delegate = self
+        self.centralManager.connect(self.peripheral!, options: nil)
+    }
+    
+    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        self.peripheral?.discoverServices(nil)
+    }
+}
+
+// MARK: - CBPeripheralDelegate
+
+extension CBLockerReadService: CBPeripheralDelegate {
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+        
         finishConnectingAndDiscoveringServices()
         
         guard error == nil else {
@@ -97,7 +128,6 @@ extension CBLockerPeripheralReadService: CBPeripheralDelegate {
         }
         
         guard let services = peripheral.services else {
-            print("peripheral didDiscoverServices, services is nil")
             return failureIfNotCanceled(SPRError.CBServiceNotFound)
         }
         
@@ -108,8 +138,8 @@ extension CBLockerPeripheralReadService: CBPeripheralDelegate {
         
         startDiscoveringCharacteristics(peripheral: peripheral, services: services)
     }
-​
-    public func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+    
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         print("peripheral didDiscoverCharacteristicsFor")
         
         finishDiscoveringCharacteristics()
@@ -126,10 +156,8 @@ extension CBLockerPeripheralReadService: CBPeripheralDelegate {
         
         startReadingValueFromCharacteristic(peripheral: peripheral, characteristic: characteristic)
     }
-​
-    public func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        print("peripheral didUpdateValueFor")
-​
+    
+    func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         finishReadingValueFromCharacteristic()
         
         guard error == nil else {
@@ -141,9 +169,14 @@ extension CBLockerPeripheralReadService: CBPeripheralDelegate {
             print("peripheral didUpdateValueFor, characteristic value is nil")
             return failureIfNotCanceled(SPRError.CBReadingCharacteristicFailed)
         }
-​
-        let readData = String(bytes: characteristicValue, encoding: String.Encoding.ascii) ?? ""
-​
-        successIfNotCanceled(readData: readData)
+        
+        locker.setReadData(String(bytes: characteristicValue, encoding: String.Encoding.ascii) ?? "")
+        print("peripheral didUpdateValueFor, read data: \(locker.readData), status: \(locker.status)")
+        
+        
+        successIfNotCanceled(readData: locker.readData)
     }
+    
+    
+    
 }
