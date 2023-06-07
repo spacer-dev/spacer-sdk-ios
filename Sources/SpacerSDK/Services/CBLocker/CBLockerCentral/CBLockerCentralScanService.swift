@@ -43,11 +43,9 @@ class CBLockerCentralScanService: NSObject {
 extension CBLockerCentralScanService: CBLockerCentralDelegate {
     func execAfterDiscovered(locker: CBLockerModel) {}
 
-    func execAfterScanning(lockers: [CBLockerModel]) -> Bool {
-        if !lockers.isEmpty {
-            convertSprLockers(lockers: lockers)
-        }
-        return !lockers.isEmpty
+    func execAfterScanning(lockers: [CBLockerModel]) {
+        centralService?.stopScan()
+        convertSprLockers(lockers: lockers)
     }
 
     func successIfNotCanceled(sprLockers: [SPRLockerModel]) {

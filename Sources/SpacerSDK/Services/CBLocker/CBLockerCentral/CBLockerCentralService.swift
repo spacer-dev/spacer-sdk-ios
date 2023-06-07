@@ -10,15 +10,13 @@ import Foundation
 
 protocol CBLockerCentralDelegate {
     func execAfterDiscovered(locker: CBLockerModel)
-    func execAfterScanning(lockers: [CBLockerModel]) -> Bool
+    func execAfterScanning(lockers: [CBLockerModel])
     func failureIfNotCanceled(_ error: SPRError)
 }
 
 class CBLockerCentralService: NSObject {
-    static let MaxScanningCnt = 3
     private var scanSeconds = CBLockerConst.ScanSeconds
     private var delegate: CBLockerCentralDelegate
-    private var scanningCnt = 0
     
     private var centralManager: CBCentralManager?
     var lockers = [CBLockerModel]()
@@ -37,19 +35,8 @@ class CBLockerCentralService: NSObject {
     }
     
     private func postDelayed() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + scanSeconds) { [self] in
-            scanningCnt += 1
-            let isScanned = self.delegate.execAfterScanning(lockers: self.lockers)
-            if isScanned {
-                return self.stopScan()
-            }
-
-            if self.scanningCnt > CBLockerCentralService.MaxScanningCnt {
-                self.stopScan()
-                delegate.failureIfNotCanceled(SPRError.CBCentralTimeout)
-            } else {
-                self.postDelayed()
-            }
+        DispatchQueue.main.asyncAfter(deadline: .now() + scanSeconds) {
+            self.delegate.execAfterScanning(lockers: self.lockers)
         }
     }
 
