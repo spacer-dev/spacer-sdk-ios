@@ -11,17 +11,18 @@ public struct SPRLockerUnitModel: Identifiable {
     public var id: String
     public var dispOrder: Int?
     public var lockerType: Int?
+    public var unitType: String
     public var spacers: [SPRLockerModel]?
 
     public var description: String {
         let spacersText = spacers?.map { $0.description }.joined(separator: "\n") ?? ""
-        return "id:\(id),spacers:\n\(spacersText)"
+        return "id:\(id),unitType:\(unitType),spacers:\n\(spacersText)"
     }
 }
 
 extension SPRLockerUnitResData {
     func toModel() -> SPRLockerUnitModel {
         let spacers = spacers?.map { $0.toModel() }
-        return SPRLockerUnitModel(id: id, spacers: spacers)
+        return SPRLockerUnitModel(id: id, unitType: unitType, spacers: spacers)
     }
 }
