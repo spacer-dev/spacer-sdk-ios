@@ -74,4 +74,10 @@ public class CBLockerService: NSObject
             },
             failure: failure)
     }
+    
+    public func read(
+        spacerId: String, success: @escaping (String) -> Void, failure: @escaping (SPRError) -> Void)
+    {
+        CBLockerCentralConnectService().read(spacerId: spacerId, success: success, failure: failure)
+    }
 }

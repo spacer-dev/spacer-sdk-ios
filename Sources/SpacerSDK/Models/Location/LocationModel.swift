@@ -14,17 +14,18 @@ public struct LocationModel: Identifiable {
     public var detail: String
     public var open: String?
     public var close: String?
+    public var doorWaitType: String
     public var units: [SPRLockerUnitModel]?
     
     public var description: String {
         let unitsText = units?.map { $0.description }.joined(separator: "\n") ?? ""
-        return "id:\(id),name:\(name),address:\(address),detail:\(detail),open:\(open ?? ""),close:\(close ?? ""),units:\n\(unitsText)"
+        return "id:\(id),name:\(name),address:\(address),detail:\(detail),open:\(open ?? ""),close:\(close ?? ""),doorWaitType:\(doorWaitType),units:\n\(unitsText)"
     }
 }
 
 extension LocationResData {
     func toModel() -> LocationModel {
         let units = units?.map { $0.toModel() }
-        return LocationModel(id: id, name: name, address: address, detail: detail, open: open, close: close, units: units)
+        return LocationModel(id: id, name: name, address: address, detail: detail, open: open, close: close, doorWaitType: doorWaitType, units: units)
     }
 }

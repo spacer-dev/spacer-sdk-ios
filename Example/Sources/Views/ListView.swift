@@ -41,6 +41,9 @@ struct ListView: View {
                         InputItemView(
                             title: Strings.CBOpenForMaintenanceTitle, desc: Strings.CBOpenForMaintenanceDesc, textHint: Strings.CBOpenForMaintenanceTextHint, runnable: openForMaintenance
                         )
+                        InputItemView(
+                            title: Strings.CBLockerReadTitle, desc: Strings.CBLockerReadDesc, textHint: Strings.CBLockerReadHint, runnable: read
+                        )
                     }
                     .padding()
                 }
@@ -172,6 +175,19 @@ struct ListView: View {
             success: {
                 AppControl.shared.hideLoading()
                 showingAlert = AlertItem.CBLockerTakeWithKeySuccess(urlKey)
+            },
+            failure: failure
+        )
+    }
+    
+    private func read(spacerId: String) {
+        AppControl.shared.showLoading()
+                
+        cbLockerService.read(
+            spacerId: spacerId,
+            success: { readData in
+                AppControl.shared.hideLoading()
+                showingAlert = AlertItem.CBLockerReadSuccess(readData)
             },
             failure: failure
         )

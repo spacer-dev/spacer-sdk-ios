@@ -8,11 +8,12 @@
 import Foundation
 
 struct LocationResData: Codable {
-    var id: String
-    var name: String
-    var address: String
-    var detail: String
-    var open: String?
-    var close: String?
-    var units: [SPRLockerUnitResData]?
+    public var id: String
+    public var name: String
+    public var address: String
+    public var detail: String
+    public var open: String?
+    public var close: String?
+    public var doorWaitType: String
+    public var units: [SPRLockerUnitResData]?
 }
