@@ -46,7 +46,7 @@ Provides basic location information
   
 ## Requirement
 
-- iOS 10.2+
+- iOS 11.0+
 - Bluetooth Low Energy (BLE) 4.2+
 
 ## Usage
