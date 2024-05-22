@@ -39,7 +39,7 @@ extension CBLockerPeripheralTakeService: CBLockerPeripheralDelegate {
     }
 
     func saveKey(locker: CBLockerModel, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
-        let reqData = KeyGetResultReqData(spacerId: locker.id, readData: locker.readData)
+        let reqData = KeyGetResultReqData(spacerId: locker.id)
 
         API.post(
             path: ApiPaths.KeyGetResult,
