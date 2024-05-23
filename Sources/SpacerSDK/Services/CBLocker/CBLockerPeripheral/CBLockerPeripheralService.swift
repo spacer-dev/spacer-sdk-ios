@@ -192,12 +192,6 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
 
         finishReadingValueFromCharacteristic()
         
-        // ↓TODO：テスト用修正のため、テスト完了後削除予定
-        if !isRetry {
-            print("書き込み前　リトライ発生")
-            return failureIfNotCanceled(SPRError.CBReadingCharacteristicFailed)
-        }
-
         guard error == nil else {
             print("peripheral didUpdateValueFor failed with error: \(String(describing: error))")
             return failureIfNotCanceled(SPRError.CBReadingCharacteristicFailed)
@@ -205,6 +199,12 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
 
         guard let characteristicValue = characteristic.value else {
             print("peripheral didUpdateValueFor, characteristic value is nil")
+            return failureIfNotCanceled(SPRError.CBReadingCharacteristicFailed)
+        }
+        
+        // ↓TODO：テスト用修正のため、テスト完了後削除予定
+        if !isRetry {
+            print("書き込み前　リトライ発生")
             return failureIfNotCanceled(SPRError.CBReadingCharacteristicFailed)
         }
 
