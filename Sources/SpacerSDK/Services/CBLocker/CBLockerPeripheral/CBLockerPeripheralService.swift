@@ -89,21 +89,12 @@ class CBLockerPeripheralService: NSObject {
     }
 
     private func startReadingValueFromCharacteristic(peripheral: CBPeripheral, characteristic: CBCharacteristic) {
-        if locker.status == .none {
-            timeouts.readBeforeWrite.set()
-        } else if locker.status == .write {
-            timeouts.readAfterWrite.set()
-        }
-        
+        timeouts.readBeforeWrite.set()
         peripheral.readValue(for: characteristic)
     }
 
     private func finishReadingValueFromCharacteristic() {
-        if locker.status == .none {
-            timeouts.readBeforeWrite.clear()
-        } else if locker.status == .write {
-            timeouts.readAfterWrite.clear()
-        }
+        timeouts.readBeforeWrite.clear()
     }
 
     private func startGettingKey(peripheral: CBPeripheral, characteristic: CBCharacteristic) {
@@ -200,7 +191,7 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
         print("peripheral didUpdateValueFor")
 
         finishReadingValueFromCharacteristic()
-
+        
         guard error == nil else {
             print("peripheral didUpdateValueFor failed with error: \(String(describing: error))")
             return failureIfNotCanceled(SPRError.CBReadingCharacteristicFailed)
@@ -217,11 +208,7 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
         if isRetry, alreadyWrittenToCharacteristic(locker: locker) {
             startSavingKey()
         } else {
-            if locker.status == .none {
-                startGettingKey(peripheral: peripheral, characteristic: characteristic)
-            } else if locker.status == .write {
-                startSavingKey()
-            }
+            startGettingKey(peripheral: peripheral, characteristic: characteristic)
         }
     }
 
@@ -236,6 +223,6 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
         }
 
         locker.updateStatus(.write)
-        startReadingValueFromCharacteristic(peripheral: peripheral, characteristic: characteristic)
+        startSavingKey()
     }
 }

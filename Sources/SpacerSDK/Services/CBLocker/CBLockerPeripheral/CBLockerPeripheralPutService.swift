@@ -40,7 +40,7 @@ extension CBLockerPeripheralPutService: CBLockerPeripheralDelegate {
     }
 
     func saveKey(locker: CBLockerModel, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
-        let reqData = KeyGenerateResultReqData(spacerId: locker.id, readData: locker.readData)
+        let reqData = KeyGenerateResultReqData(spacerId: locker.id)
 
         API.post(
             path: ApiPaths.KeyGenerateResult,
