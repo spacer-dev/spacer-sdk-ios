@@ -15,6 +15,7 @@ public struct SPRLockerModel: Identifiable {
     public var version: String
     public var doorStatus: String
     public var doorStatusExpiredAt: String?
+    public var isHttpSupported: Bool
 
     public var description: String {
         return "id:\(id),status:\(status),size:\(size),closedWait:\(closedWait),version:\(version),doorStatus:\(doorStatus),doorStatusExpiredAt:\(doorStatusExpiredAt ?? "")"
@@ -24,6 +25,6 @@ public struct SPRLockerModel: Identifiable {
 extension SPRLockerResData {
     func toModel() -> SPRLockerModel {
         let status = SPRLockerStatus(rawValue: self.status) ?? .unknown
-        return SPRLockerModel(id: id, status: status, size: size ?? "unknown", closedWait: closedWait, version: version, doorStatus: doorStatus, doorStatusExpiredAt: doorStatusExpiredAt)
+        return SPRLockerModel(id: id, status: status, size: size ?? "unknown", closedWait: closedWait, version: version, doorStatus: doorStatus, doorStatusExpiredAt: doorStatusExpiredAt, isHttpSupported: isHttpSupported)
     }
 }

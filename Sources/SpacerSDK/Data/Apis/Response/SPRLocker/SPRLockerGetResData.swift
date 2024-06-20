@@ -1,14 +1,14 @@
 //
-//  SPRLockerGetResData.swift
+//  File.swift
+//  
 //
-//
-//  Created by Takehito Soi on 2021/07/13.
+//  Created by ASW on 2024/06/19.
 //
 
 import Foundation
 
 struct SPRLockerGetResData: IResData {
-    var spacers: [SPRLockerResData]?
+    var spacer: SPRLockerResData?
     var result: Bool
     var error: ErrorResData?
 }

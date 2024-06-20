@@ -7,6 +7,8 @@
 
 import CoreBluetooth
 import Foundation
+import CoreLocation
+
 
 class CBLockerCentralConnectService: NSObject {
     private var token: String!
@@ -17,12 +19,22 @@ class CBLockerCentralConnectService: NSObject {
     private var readSuccess: (String) -> Void = { _ in }
     private var failure: (SPRError) -> Void = { _ in }
     
+    private let sprLockerService = SPR.sprLockerService()
+    private let httpLockerService = HttpLockerService()
+    private var isHttpSupported = false
     private var centralService: CBLockerCentralService?
     private var isCanceled = false
+    private var locationManager = CLLocationManager()
+    private var lat = Double()
+    private var Ing = Double()
+    var pendingError: SPRError?
     
     override init() {
         super.init()
         self.centralService = CBLockerCentralService(delegate: self)
+        locationManager.delegate = self
+        // アプリの使用中に位置情報サービスを使用する許可をリクエストする
+        locationManager.requestWhenInUseAuthorization()
     }
     
     private func scan() {
@@ -74,6 +86,42 @@ class CBLockerCentralConnectService: NSObject {
 
     private func connectWithRetry(locker: CBLockerModel, retryNum: Int = 0) {
         guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
+        
+        // １回目のリトライはHTTPに行く
+        if retryNum == 1 {
+//            pendingError = error
+            // connectWithRetryに進んでいる = scanが成功している　→そのためisScannedは不要なのでは？
+            sprLockerService.get(
+                token: token,
+                spacerId: spacerId,
+                success: { spacer in
+                    if spacer.isHttpSupported {
+                        // 位置情報の使用許可を要求
+                        self.locationManager.requestWhenInUseAuthorization()
+                        // アプリの使用中に位置情報サービスを使用する許可をリクエストする
+                        self.locationManager.requestLocation()
+                    }
+                },
+                failure: { error in self.failure(error) }
+            )
+            
+            if isHttpSupported {
+                // 位置情報の使用許可を要求
+                locationManager.requestWhenInUseAuthorization()
+                // アプリの使用中に位置情報サービスを使用する許可をリクエストする
+                locationManager.requestLocation()
+                
+//                httpLockerService.put(
+//                    token: token,
+//                    spacerId: spacerId,
+//                    lat: lat,
+//                    Ing: Ing,
+//                    success: success,
+//                    failure: { error in self.failure(error) }
+//                )
+            }
+        }
+        
         let peripheralDelegate =
             CBLockerPeripheralService.Factory.create(
                 type: type, token: token, locker: locker, isRetry: retryNum > 0, success: {
@@ -158,12 +206,52 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
         }
     }
 
+    // 検出失敗時の処理？
     func failureIfNotCanceled(_ error: SPRError) {
         centralService?.stopScan()
+        pendingError = error
+        // readAPI
+        sprLockerService.get(
+            token: token,
+            spacerId: spacerId,
+            success: { spacer in
+                if spacer.isHttpSupported {
+                    // 位置情報の使用許可を要求
+                    self.locationManager.requestWhenInUseAuthorization()
+                    // アプリの使用中に位置情報サービスを使用する許可をリクエストする
+                    self.locationManager.requestLocation()
+                }
+            },
+            failure: { error in self.failure(error) }
+        )
 
-        if !isCanceled {
-            isCanceled = true
-            failure(error)
-        }
+//        if !isCanceled {
+//            isCanceled = true
+//            failure(error)
+//        }
     }
+}
+
+extension CBLockerCentralConnectService:CLLocationManagerDelegate{
+    // 位置情報が更新されたときに呼ばれるデリゲートメソッド
+        func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+            if let location = locations.first {
+                let latitude = location.coordinate.latitude
+                let longitude = location.coordinate.longitude
+                print("Latitude: \(latitude), Longitude: \(longitude)")
+                
+                // 必要に応じて、位置情報の更新を停止
+                locationManager.stopUpdatingLocation()
+                
+                // HTTPでの施錠
+                httpLockerService.put(
+                    token: token,
+                    spacerId: spacerId,
+                    lat: lat,
+                    Ing: Ing,
+                    success: success,
+                    failure: { error in self.failure(error) }
+                )
+            }
+        }
 }
