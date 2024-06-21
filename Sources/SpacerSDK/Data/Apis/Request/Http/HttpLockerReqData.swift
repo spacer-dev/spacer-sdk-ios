@@ -15,6 +15,8 @@ struct HttpLockerReqData: IReqData {
     func toParams() -> [String: Any] {
         [
             "spacerId": spacerId,
+            "lat": lat,
+            "lng": lng,
         ]
     }
 }
