@@ -9,6 +9,8 @@ import Foundation
 
 struct HttpLockerReqData: IReqData {
     var spacerId: String
+    var lat: Double
+    var lng: Double
 
     func toParams() -> [String: Any] {
         [

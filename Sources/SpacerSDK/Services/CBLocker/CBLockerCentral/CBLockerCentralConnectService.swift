@@ -113,7 +113,7 @@ class CBLockerCentralConnectService: NSObject {
 //                    token: token,
 //                    spacerId: spacerId,
 //                    lat: lat,
-//                    Ing: Ing,
+//                    lng: lng,
 //                    success: success,
 //                    failure: { error in self.failure(error) }
 //                )
@@ -235,7 +235,7 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.first {
             let lat = location.coordinate.latitude
-            let Ing = location.coordinate.longitude
+            let lng = location.coordinate.longitude
                 
             // 必要に応じて、位置情報の更新を停止
             locationManager.stopUpdatingLocation()
@@ -245,7 +245,7 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
                 token: token,
                 spacerId: spacerId,
                 lat: lat,
-                Ing: Ing,
+                lng: lng,
                 success: success,
                 failure: { error in self.failure(error) }
             )
