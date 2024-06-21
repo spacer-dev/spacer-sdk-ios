@@ -232,26 +232,33 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     }
 }
 
-extension CBLockerCentralConnectService:CLLocationManagerDelegate{
+extension CBLockerCentralConnectService: CLLocationManagerDelegate {
     // 位置情報が更新されたときに呼ばれるデリゲートメソッド
-        func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-            if let location = locations.first {
-                let latitude = location.coordinate.latitude
-                let longitude = location.coordinate.longitude
-                print("Latitude: \(latitude), Longitude: \(longitude)")
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        if let location = locations.first {
+            let latitude = location.coordinate.latitude
+            let longitude = location.coordinate.longitude
+            print("Latitude: \(latitude), Longitude: \(longitude)")
                 
-                // 必要に応じて、位置情報の更新を停止
-                locationManager.stopUpdatingLocation()
+            // 必要に応じて、位置情報の更新を停止
+            locationManager.stopUpdatingLocation()
                 
-                // HTTPでの施錠
-                httpLockerService.put(
-                    token: token,
-                    spacerId: spacerId,
-                    lat: lat,
-                    Ing: Ing,
-                    success: success,
-                    failure: { error in self.failure(error) }
-                )
-            }
+            // HTTPでの施錠
+            httpLockerService.put(
+                token: token,
+                spacerId: spacerId,
+                lat: lat,
+                Ing: Ing,
+                success: success,
+                failure: { error in self.failure(error) }
+            )
         }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print("error: \(error)")
+        if let pendingError = pendingError{
+            failure(pendingError)
+        }
+    }
 }
