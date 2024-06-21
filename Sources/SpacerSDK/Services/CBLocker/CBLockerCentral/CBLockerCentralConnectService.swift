@@ -25,9 +25,7 @@ class CBLockerCentralConnectService: NSObject {
     private var centralService: CBLockerCentralService?
     private var isCanceled = false
     private var locationManager = CLLocationManager()
-    private var lat = Double()
-    private var Ing = Double()
-    var pendingError: SPRError?
+    var sprError: SPRError?
     
     override init() {
         super.init()
@@ -209,7 +207,7 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     // 検出失敗時の処理？
     func failureIfNotCanceled(_ error: SPRError) {
         centralService?.stopScan()
-        pendingError = error
+        sprError = error
         // readAPI
         sprLockerService.getLocker(
             token: token,
@@ -236,9 +234,8 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
     // 位置情報が更新されたときに呼ばれるデリゲートメソッド
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.first {
-            let latitude = location.coordinate.latitude
-            let longitude = location.coordinate.longitude
-            print("Latitude: \(latitude), Longitude: \(longitude)")
+            let lat = location.coordinate.latitude
+            let Ing = location.coordinate.longitude
                 
             // 必要に応じて、位置情報の更新を停止
             locationManager.stopUpdatingLocation()
@@ -256,9 +253,9 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("error: \(error)")
-        if let pendingError = pendingError{
-            failure(pendingError)
+        print("didFailWithError: \(error)")
+        if let sprError = sprError{
+            failure(sprError)
         }
     }
 }
