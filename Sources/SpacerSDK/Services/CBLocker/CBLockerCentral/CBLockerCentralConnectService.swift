@@ -91,7 +91,7 @@ class CBLockerCentralConnectService: NSObject {
         if retryNum == 1 {
 //            pendingError = error
             // connectWithRetryに進んでいる = scanが成功している　→そのためisScannedは不要なのでは？
-            sprLockerService.get(
+            sprLockerService.getLocker(
                 token: token,
                 spacerId: spacerId,
                 success: { spacer in
@@ -211,7 +211,7 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
         centralService?.stopScan()
         pendingError = error
         // readAPI
-        sprLockerService.get(
+        sprLockerService.getLocker(
             token: token,
             spacerId: spacerId,
             success: { spacer in

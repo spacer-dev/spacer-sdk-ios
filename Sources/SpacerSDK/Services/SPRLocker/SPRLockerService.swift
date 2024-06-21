@@ -35,11 +35,11 @@ public class SPRLockerService {
     ///   - spacerId: Locker Unit IDs, ex) "SPACER054"
     ///   - success: Callback on success
     ///   - failure: Callback on failure
-    public func get(token: String, spacerId: String, success: @escaping (SPRLockerModel) -> Void, failure: @escaping (SPRError) -> Void) {
+    public func getLocker(token: String, spacerId: String, success: @escaping (SPRLockerModel) -> Void, failure: @escaping (SPRError) -> Void) {
         let reqData = SPRLockerGetReqData(spacerId: spacerId)
         let path = "\(ApiPaths.lockerSpacer)\(spacerId)"
         
-        API.post(
+        API.get(
             path: path,
             token: token,
             reqData: reqData,
