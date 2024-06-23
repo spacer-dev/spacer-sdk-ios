@@ -87,14 +87,10 @@ class CBLockerCentralConnectService: NSObject {
     
     private func connectWithRetry(locker: CBLockerModel, retryNum: Int = 0) {
         print("connectWithRetry：\(retryNum + 1)回目")
-        // １回目のリトライ時のみHTTP接続を試みる　// connectWithRetryに進んでいる = scanが成功している　→そのためisScannedは不要なのでは？
-        if retryNum == 1 {
+        if retryNum == 1, isHttpSupported {
             requestLocation()
             print("connectWithRetry時点のisHttpSupported:\(isHttpSupported)")
-            if isHttpSupported {
-                // HTTP通信対応ロッカーの場合、下のBLE通信の処理に行かせない
-                return
-            }
+            return
         }
         print("connectWithRetry：BLE通信開始")
         guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
