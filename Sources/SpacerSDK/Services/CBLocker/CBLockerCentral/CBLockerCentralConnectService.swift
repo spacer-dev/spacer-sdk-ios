@@ -83,43 +83,16 @@ class CBLockerCentralConnectService: NSObject {
     }
 
     private func connectWithRetry(locker: CBLockerModel, retryNum: Int = 0) {
-        guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
-        
-        // １回目のリトライはHTTPに行く
+        // １回目のリトライ時のみHTTP接続を試みる　// connectWithRetryに進んでいる = scanが成功している　→そのためisScannedは不要なのでは？
         if retryNum == 1 {
-//            pendingError = error
-            // connectWithRetryに進んでいる = scanが成功している　→そのためisScannedは不要なのでは？
-            sprLockerService.getLocker(
-                token: token,
-                spacerId: spacerId,
-                success: { spacer in
-                    if spacer.isHttpSupported {
-                        // 位置情報の使用許可を要求
-                        self.locationManager.requestWhenInUseAuthorization()
-                        // アプリの使用中に位置情報サービスを使用する許可をリクエストする
-                        self.locationManager.requestLocation()
-                    }
-                },
-                failure: { error in self.failure(error) }
-            )
-            
+            getLocker()
+            // HTTP通信対応ロッカーの場合、下のBLE通信の処理に行かせない
             if isHttpSupported {
-                // 位置情報の使用許可を要求
-                locationManager.requestWhenInUseAuthorization()
-                // アプリの使用中に位置情報サービスを使用する許可をリクエストする
-                locationManager.requestLocation()
-                
-//                httpLockerService.put(
-//                    token: token,
-//                    spacerId: spacerId,
-//                    lat: lat,
-//                    lng: lng,
-//                    success: success,
-//                    failure: { error in self.failure(error) }
-//                )
+                return
             }
         }
         
+        guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
         let peripheralDelegate =
             CBLockerPeripheralService.Factory.create(
                 type: type, token: token, locker: locker, isRetry: retryNum > 0, success: {
@@ -168,6 +141,27 @@ class CBLockerCentralConnectService: NSObject {
         centralService?.connect(peripheral: peripheral)
     }
     
+    private func getLocker(error: SPRError? = nil, isDiscoverFailed: Bool = false) {
+        sprLockerService.getLocker(
+            token: token,
+            spacerId: spacerId,
+            success: { spacer in
+                if spacer.isHttpSupported {
+                    // 位置情報の使用許可を要求
+                    self.locationManager.requestWhenInUseAuthorization()
+                    // アプリの使用中に位置情報サービスを使用する許可をリクエストする
+                    self.locationManager.requestLocation()
+                } else if isDiscoverFailed,!self.isCanceled {
+                    if let error = error {
+                        self.isCanceled = true
+                        self.failure(error)
+                    }
+                }
+            },
+            failure: { error in self.failure(error) }
+        )
+    }
+    
     private func retryOrFailure(error: SPRError, locker: CBLockerModel, retryNum: Int, executable: @escaping () -> Void) {
         if retryNum < CBLockerConst.MaxRetryNum {
             executable()
@@ -204,41 +198,52 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
         }
     }
 
-    // 検出失敗時の処理？
+    // 最終的にコネクトできなかった場合
     func failureIfNotCanceled(_ error: SPRError) {
         centralService?.stopScan()
         sprError = error
-        // readAPI
-        sprLockerService.getLocker(
-            token: token,
-            spacerId: spacerId,
-            success: { spacer in
-                if spacer.isHttpSupported {
-                    // 位置情報の使用許可を要求
-                    self.locationManager.requestWhenInUseAuthorization()
-                    // アプリの使用中に位置情報サービスを使用する許可をリクエストする
-                    self.locationManager.requestLocation()
-                }
-            },
-            failure: { error in self.failure(error) }
-        )
-
-//        if !isCanceled {
-//            isCanceled = true
-//            failure(error)
-//        }
+        getLocker(error: error, isDiscoverFailed: true)
     }
 }
 
 extension CBLockerCentralConnectService: CLLocationManagerDelegate {
-    // 位置情報が更新されたときに呼ばれるデリゲートメソッド
+    // 位置情報が更新されたとき
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.first {
             let lat = location.coordinate.latitude
             let lng = location.coordinate.longitude
                 
-            // 必要に応じて、位置情報の更新を停止
+            // 位置情報の更新を停止
             locationManager.stopUpdatingLocation()
+            
+            if type == .put {
+                httpLockerService.put(
+                    token: token,
+                    spacerId: spacerId,
+                    lat: lat,
+                    lng: lng,
+                    success: success,
+                    failure: { error in self.failure(error) }
+                )
+            } else if type == .take {
+                httpLockerService.take(
+                    token: token,
+                    spacerId: spacerId,
+                    lat: lat,
+                    lng: lng,
+                    success: success,
+                    failure: { error in self.failure(error) }
+                )
+            } else if type == .openForMaintenance {
+                httpLockerService.openForMaintenance(
+                    token: token,
+                    spacerId: spacerId,
+                    lat: lat,
+                    lng: lng,
+                    success: success,
+                    failure: { error in self.failure(error) }
+                )
+            }
                 
             // HTTPでの施錠
             httpLockerService.put(
@@ -254,7 +259,7 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("didFailWithError: \(error)")
-        if let sprError = sprError{
+        if let sprError = sprError {
             failure(sprError)
         }
     }
