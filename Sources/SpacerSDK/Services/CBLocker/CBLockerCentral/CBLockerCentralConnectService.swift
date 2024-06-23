@@ -26,7 +26,7 @@ class CBLockerCentralConnectService: NSObject {
     private var centralService: CBLockerCentralService?
     private var isCanceled = false
     private var locationManager = CLLocationManager()
-    // 位置情報が複数回更新されるのを防ぐためのフラグ
+    // 位置情報が複数回更新されることを防ぐためのフラグ
     private var isRequestingLocation = false
     private var sprError: SPRError?
     
@@ -50,7 +50,7 @@ class CBLockerCentralConnectService: NSObject {
         self.success = success
         self.failure = failure
 
-        scan()
+        checkHttpAvailable { self.scan() }
     }
     
     func take(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
@@ -61,7 +61,7 @@ class CBLockerCentralConnectService: NSObject {
         self.success = success
         self.failure = failure
 
-        scan()
+        checkHttpAvailable { self.scan() }
     }
     
     func openForMaintenance(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
@@ -72,7 +72,7 @@ class CBLockerCentralConnectService: NSObject {
         self.success = success
         self.failure = failure
 
-        scan()
+        checkHttpAvailable { self.scan() }
     }
     
     func read(spacerId: String, success: @escaping (String) -> Void, failure: @escaping (SPRError) -> Void) {
@@ -89,13 +89,13 @@ class CBLockerCentralConnectService: NSObject {
         print("connectWithRetry：\(retryNum + 1)回目")
         // １回目のリトライ時のみHTTP接続を試みる　// connectWithRetryに進んでいる = scanが成功している　→そのためisScannedは不要なのでは？
         if retryNum == 1 {
-            getLocker()
-            // HTTP通信対応ロッカーの場合、下のBLE通信の処理に行かせない
+            requestLocation()
+            print("connectWithRetry時点のisHttpSupported:\(isHttpSupported)")
             if isHttpSupported {
+                // HTTP通信対応ロッカーの場合、下のBLE通信の処理に行かせない
                 return
             }
         }
-        
         print("connectWithRetry：BLE通信開始")
         guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
         let peripheralDelegate =
@@ -146,42 +146,38 @@ class CBLockerCentralConnectService: NSObject {
         centralService?.connect(peripheral: peripheral)
     }
     
-    private func getLocker(error: SPRError? = nil, isDiscoverFailed: Bool = false) {
+    private func checkHttpAvailable(error: SPRError? = nil, callBack: @escaping () -> Void) {
         print("HTTP:readAPI開始")
         sprLockerService.getLocker(
             token: token,
             spacerId: spacerId,
             success: { spacer in
                 if spacer.isHttpSupported {
+                    self.isHttpSupported = true
                     // 位置情報サービスのステータスを確認
                     let status = CLLocationManager.authorizationStatus()
                     
                     switch status {
                     case .notDetermined:
-                        // ステータスが未確定の場合→ユーザーにアプリの使用中に位置情報サービスを使用する許可をリクエスト+現在地取得
+                        // 未確定の場合 → ユーザーにアプリの使用中に位置情報サービスを使用する許可をリクエスト
                         self.locationManager.requestWhenInUseAuthorization()
-                        self.requestLocationOnce()
                     case .denied, .restricted:
-                        // 許可が拒否されている場合 → ダイアログ表示
+                        // 拒否されている場合 → ダイアログ表示
                         self.showLocationPermissionAlert()
                     case .authorizedWhenInUse, .authorizedAlways:
-                        // 許可されている場合 → 現在地取得
-                        self.requestLocationOnce()
+                        // 許可されている場合 → 何もしない
+                        break
                     @unknown default:
                         break
                     }
-                } else if isDiscoverFailed,!self.isCanceled {
-                    if let error = error {
-                        self.isCanceled = true
-                        self.failure(error)
-                    }
                 }
+                callBack()
             },
-            failure: { error in self.failure(error) }
+            failure: { _ in callBack() }
         )
     }
     
-    func requestLocationOnce() {
+    func requestLocation() {
         // 位置情報が複数回更新されるのを防ぐ仕様
         if !isRequestingLocation {
             isRequestingLocation = true
@@ -248,15 +244,15 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
         }
     }
 
-    // 最終的にコネクトできなかった場合
+    // スキャンができる状態でない場合、検出失敗した場合、接続失敗した場合
     func failureIfNotCanceled(_ error: SPRError) {
         centralService?.stopScan()
-        if type == .read,!isCanceled {
+        if isHttpSupported {
+            sprError = error
+            requestLocation()
+        } else {
             isCanceled = true
             failure(error)
-        } else {
-            sprError = error
-            getLocker(error: error, isDiscoverFailed: true)
         }
     }
 }
