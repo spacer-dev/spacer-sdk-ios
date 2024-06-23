@@ -79,7 +79,7 @@ class CBLockerPeripheralService: NSObject {
         timeouts.discover.set()
 
         for service in services {
-            print(service)
+            print("\(service)のCharacteristicsの検出開始")
             peripheral.discoverCharacteristics([CBLockerConst.CharacteristicUUID], for: service)
         }
     }
@@ -90,6 +90,7 @@ class CBLockerPeripheralService: NSObject {
 
     private func startReadingValueFromCharacteristic(peripheral: CBPeripheral, characteristic: CBCharacteristic) {
         timeouts.readBeforeWrite.set()
+        print("Characteristicsのvalueのread開始")
         peripheral.readValue(for: characteristic)
     }
 
@@ -106,7 +107,7 @@ class CBLockerPeripheralService: NSObject {
 
     private func startWritingValueToCharacteristic(peripheral: CBPeripheral, characteristic: CBCharacteristic, data: Data) {
         timeouts.write.set()
-
+        print("Characteristicsのvalueのwrite開始")
         peripheral.writeValue(data, for: characteristic, type: .withResponse)
     }
 
