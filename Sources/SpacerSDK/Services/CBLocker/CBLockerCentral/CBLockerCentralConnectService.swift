@@ -8,6 +8,7 @@
 import CoreBluetooth
 import Foundation
 import CoreLocation
+import UIKit
 
 
 class CBLockerCentralConnectService: NSObject {
@@ -147,9 +148,27 @@ class CBLockerCentralConnectService: NSObject {
             spacerId: spacerId,
             success: { spacer in
                 if spacer.isHttpSupported {
-                    // 位置情報の使用許可を要求
+                    // 位置情報サービスのステータスを確認
+                    let status = CLLocationManager.authorizationStatus()
+                            
+                    switch status {
+                    case .notDetermined:
+                        // 初回リクエストの場合
+                        self.locationManager.requestWhenInUseAuthorization()
+                    case .denied, .restricted:
+                        // 許可が拒否された場合
+                        self.showLocationPermissionAlert()
+                    case .authorizedWhenInUse, .authorizedAlways:
+                        // 許可されている場合
+                        self.locationManager.requestLocation()
+                    @unknown default:
+                        break
+                    }
+                    // 位置データの精度を最大にする（NOTE:最大にするデメリットとして利用できるまでの時間が長くなる）
+                    self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
+                    // ユーザーにアプリの使用中に位置情報サービスを使用する許可をリクエストする
                     self.locationManager.requestWhenInUseAuthorization()
-                    // アプリの使用中に位置情報サービスを使用する許可をリクエストする
+                    // 現在地取得
                     self.locationManager.requestLocation()
                 } else if isDiscoverFailed,!self.isCanceled {
                     if let error = error {
@@ -160,6 +179,31 @@ class CBLockerCentralConnectService: NSObject {
             },
             failure: { error in self.failure(error) }
         )
+    }
+    
+    func showLocationPermissionAlert() {
+        guard let window = UIApplication.shared.windows.first,
+              let rootViewController = window.rootViewController else {
+            return
+        }
+            let alertController = UIAlertController(
+                title: "位置情報の利用許可が必要です",
+                message: "設定アプリで位置情報の利用を許可してください。",
+                preferredStyle: .alert
+            )
+            
+            let settingsAction = UIAlertAction(title: "設定へ移動", style: .default) { _ in
+                // 設定アプリを開く
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                }
+            }
+            let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel, handler: nil)
+            
+            alertController.addAction(settingsAction)
+            alertController.addAction(cancelAction)
+            
+        rootViewController.present(alertController, animated: true, completion: nil)
     }
     
     private func retryOrFailure(error: SPRError, locker: CBLockerModel, retryNum: Int, executable: @escaping () -> Void) {
@@ -207,14 +251,11 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
 }
 
 extension CBLockerCentralConnectService: CLLocationManagerDelegate {
-    // 位置情報が更新されたとき
+    // 現在地取得成功
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.first {
             let lat = location.coordinate.latitude
             let lng = location.coordinate.longitude
-                
-            // 位置情報の更新を停止
-            locationManager.stopUpdatingLocation()
             
             if type == .put {
                 httpLockerService.put(
@@ -247,6 +288,7 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
         }
     }
     
+    // 現在地取得失敗
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("didFailWithError: \(error)")
         if let sprError = sprError {
