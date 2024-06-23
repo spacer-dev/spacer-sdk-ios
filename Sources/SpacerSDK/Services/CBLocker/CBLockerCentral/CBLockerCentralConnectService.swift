@@ -26,14 +26,16 @@ class CBLockerCentralConnectService: NSObject {
     private var centralService: CBLockerCentralService?
     private var isCanceled = false
     private var locationManager = CLLocationManager()
-    var sprError: SPRError?
+    // 位置情報が複数回更新されるのを防ぐためのフラグ
+    private var isRequestingLocation = false
+    private var sprError: SPRError?
     
     override init() {
         super.init()
         self.centralService = CBLockerCentralService(delegate: self)
         locationManager.delegate = self
-        // アプリの使用中に位置情報サービスを使用する許可をリクエストする
-        locationManager.requestWhenInUseAuthorization()
+        // 位置データの精度を最大にする（NOTE:最大にするデメリットとして利用できるまでの時間が長くなる）
+        self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
     }
     
     private func scan() {
@@ -82,7 +84,7 @@ class CBLockerCentralConnectService: NSObject {
 
         scan()
     }
-
+    
     private func connectWithRetry(locker: CBLockerModel, retryNum: Int = 0) {
         // １回目のリトライ時のみHTTP接続を試みる　// connectWithRetryに進んでいる = scanが成功している　→そのためisScannedは不要なのでは？
         if retryNum == 1 {
@@ -148,8 +150,6 @@ class CBLockerCentralConnectService: NSObject {
             spacerId: spacerId,
             success: { spacer in
                 if spacer.isHttpSupported {
-                    // 位置データの精度を最大にする（NOTE:最大にするデメリットとして利用できるまでの時間が長くなる）
-                    self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
                     // 位置情報サービスのステータスを確認
                     let status = CLLocationManager.authorizationStatus()
                     
@@ -157,13 +157,13 @@ class CBLockerCentralConnectService: NSObject {
                     case .notDetermined:
                         // ステータスが未確定の場合→ユーザーにアプリの使用中に位置情報サービスを使用する許可をリクエスト+現在地取得
                         self.locationManager.requestWhenInUseAuthorization()
-                        self.locationManager.requestLocation()
+                        self.requestLocationOnce()
                     case .denied, .restricted:
-                        // 許可が拒否された場合
+                        // 許可が拒否されている場合 → ダイアログ表示
                         self.showLocationPermissionAlert()
                     case .authorizedWhenInUse, .authorizedAlways:
-                        // 許可されている場合→現在地取得
-                        self.locationManager.requestLocation()
+                        // 許可されている場合 → 現在地取得
+                        self.requestLocationOnce()
                     @unknown default:
                         break
                     }
@@ -178,28 +178,34 @@ class CBLockerCentralConnectService: NSObject {
         )
     }
     
+    func requestLocationOnce() {
+        // 位置情報が複数回更新されるのを防ぐ仕様
+        if !isRequestingLocation {
+            isRequestingLocation = true
+            locationManager.requestLocation()
+        }
+    }
+    
     func showLocationPermissionAlert() {
         guard let window = UIApplication.shared.windows.first,
-              let rootViewController = window.rootViewController else {
+              let rootViewController = window.rootViewController
+        else {
             return
         }
-            let alertController = UIAlertController(
-                title: "位置情報の利用許可が必要です",
-                message: "設定アプリで位置情報の利用を許可してください。",
-                preferredStyle: .alert
-            )
-            
-            let settingsAction = UIAlertAction(title: "設定へ移動", style: .default) { _ in
-                // 設定アプリを開く
-                if let url = URL(string: UIApplication.openSettingsURLString) {
-                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
-                }
+        let alertController = UIAlertController(
+            title: "位置情報の利用許可が必要です",
+            message: "設定アプリで位置情報の利用を許可してください。",
+            preferredStyle: .alert
+        )
+        let settingsAction = UIAlertAction(title: "設定へ移動", style: .default) { _ in
+            // 設定アプリを開く
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
             }
-            let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel, handler: nil)
-            
-            alertController.addAction(settingsAction)
-            alertController.addAction(cancelAction)
-            
+        }
+        let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel, handler: nil)
+        alertController.addAction(settingsAction)
+        alertController.addAction(cancelAction)
         rootViewController.present(alertController, animated: true, completion: nil)
     }
     
@@ -282,11 +288,13 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
                     failure: { error in self.failure(error) }
                 )
             }
+            isRequestingLocation = false
         }
     }
     
     // 現在地取得失敗
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        isRequestingLocation = false
         print("didFailWithError: \(error)")
         if let sprError = sprError {
             failure(sprError)
