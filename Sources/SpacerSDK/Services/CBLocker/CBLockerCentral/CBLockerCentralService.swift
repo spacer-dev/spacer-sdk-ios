@@ -66,20 +66,24 @@ class CBLockerCentralService: NSObject {
 
     func stopScan() {
         if isScanning == true {
+            print("BLE:scan終了")
             centralManager?.stopScan()
         }
     }
 
     func connect(peripheral: CBPeripheral) {
+        print("BLE:接続開始")
         centralManager?.connect(peripheral, options: nil)
     }
 
     func discoverServices(peripheral: CBPeripheral) {
+        print("BLE:サービス検出開始")
         peripheral.discoverServices([CBLockerConst.ServiceUUID])
     }
 
     func disconnect(peripheral: CBPeripheral) {
         DispatchQueue.main.asyncAfter(deadline: .now() + CBLockerConst.DelayDisconnectSeconds) {
+            print("BLE:接続キャンセル開始")
             self.centralManager?.cancelPeripheralConnection(peripheral)
         }
     }
@@ -89,6 +93,7 @@ extension CBLockerCentralService: CBCentralManagerDelegate {
     public func centralManagerDidUpdateState(_ central: CBCentralManager) {
         let readyScan = central.state == .poweredOn && centralManager?.isScanning == false
         if readyScan {
+            print("BLE:scan開始")
             centralManager?.scanForPeripherals(withServices: [CBLockerConst.ServiceUUID], options: nil)
         } else {
             if let error = central.state.toSPRError() {
@@ -98,16 +103,19 @@ extension CBLockerCentralService: CBCentralManagerDelegate {
     }
 
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi RSSI: NSNumber) {
+        print("BLE:検出成功")
         let id = advertisementData[CBLockerConst.AdvertisementName] as? String ?? ""
         let locker = CBLockerModel(id: id, peripheral: peripheral)
         collectLocker(locker: locker)
     }
 
     public func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        print("BLE:接続失敗")
         delegate.failureIfNotCanceled(SPRError.CBConnectingFailed)
     }
 
     public func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        print("BLE:接続成功")
         peripheral.discoverServices([CBLockerConst.ServiceUUID])
     }
 }
