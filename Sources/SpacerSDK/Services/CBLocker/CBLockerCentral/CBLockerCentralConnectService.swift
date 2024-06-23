@@ -244,16 +244,6 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
                     failure: { error in self.failure(error) }
                 )
             }
-                
-            // HTTPでの施錠
-            httpLockerService.put(
-                token: token,
-                spacerId: spacerId,
-                lat: lat,
-                lng: lng,
-                success: success,
-                failure: { error in self.failure(error) }
-            )
         }
     }
     
