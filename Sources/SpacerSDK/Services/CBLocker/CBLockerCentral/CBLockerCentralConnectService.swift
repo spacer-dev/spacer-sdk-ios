@@ -248,8 +248,10 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     // 最終的にコネクトできなかった場合
     func failureIfNotCanceled(_ error: SPRError) {
         centralService?.stopScan()
-        sprError = error
-        getLocker(error: error, isDiscoverFailed: true)
+        if type != .read {
+            sprError = error
+            getLocker(error: error, isDiscoverFailed: true)
+        }
     }
 }
 
