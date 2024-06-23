@@ -145,6 +145,7 @@ class CBLockerCentralConnectService: NSObject {
     }
     
     private func getLocker(error: SPRError? = nil, isDiscoverFailed: Bool = false) {
+        print("HTTP通信:readAPI")
         sprLockerService.getLocker(
             token: token,
             spacerId: spacerId,
@@ -266,6 +267,7 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
             let lng = location.coordinate.longitude
             
             if type == .put {
+                print("HTTP通信:預入API")
                 httpLockerService.put(
                     token: token,
                     spacerId: spacerId,
@@ -275,6 +277,7 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
                     failure: { error in self.failure(error) }
                 )
             } else if type == .take {
+                print("HTTP通信:取出API")
                 httpLockerService.take(
                     token: token,
                     spacerId: spacerId,
@@ -284,6 +287,7 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
                     failure: { error in self.failure(error) }
                 )
             } else if type == .openForMaintenance {
+                print("HTTP通信:メンテナンス取出API")
                 httpLockerService.openForMaintenance(
                     token: token,
                     spacerId: spacerId,
