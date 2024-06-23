@@ -148,28 +148,25 @@ class CBLockerCentralConnectService: NSObject {
             spacerId: spacerId,
             success: { spacer in
                 if spacer.isHttpSupported {
+                    // 位置データの精度を最大にする（NOTE:最大にするデメリットとして利用できるまでの時間が長くなる）
+                    self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
                     // 位置情報サービスのステータスを確認
                     let status = CLLocationManager.authorizationStatus()
-                            
+                    
                     switch status {
                     case .notDetermined:
-                        // 初回リクエストの場合
+                        // ステータスが未確定の場合→ユーザーにアプリの使用中に位置情報サービスを使用する許可をリクエスト+現在地取得
                         self.locationManager.requestWhenInUseAuthorization()
+                        self.locationManager.requestLocation()
                     case .denied, .restricted:
                         // 許可が拒否された場合
                         self.showLocationPermissionAlert()
                     case .authorizedWhenInUse, .authorizedAlways:
-                        // 許可されている場合
+                        // 許可されている場合→現在地取得
                         self.locationManager.requestLocation()
                     @unknown default:
                         break
                     }
-                    // 位置データの精度を最大にする（NOTE:最大にするデメリットとして利用できるまでの時間が長くなる）
-                    self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
-                    // ユーザーにアプリの使用中に位置情報サービスを使用する許可をリクエストする
-                    self.locationManager.requestWhenInUseAuthorization()
-                    // 現在地取得
-                    self.locationManager.requestLocation()
                 } else if isDiscoverFailed,!self.isCanceled {
                     if let error = error {
                         self.isCanceled = true
