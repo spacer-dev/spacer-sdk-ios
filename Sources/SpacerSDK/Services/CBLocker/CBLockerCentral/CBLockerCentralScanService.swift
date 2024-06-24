@@ -32,6 +32,7 @@ class CBLockerCentralScanService: NSObject {
     }
 
     private func convertSprLockers(lockers: [CBLockerModel]) {
+        scanedLockers = lockers
         let spacerIds = lockers.map { $0.id }
         sprLockerService.getLockers(
             token: token,
