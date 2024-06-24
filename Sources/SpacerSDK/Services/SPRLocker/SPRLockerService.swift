@@ -14,14 +14,14 @@ public class SPRLockerService {
     ///   - spacerIds: Locker IDs, ex) ["SPACER054", "SPACER055"]
     ///   - success: Callback on success
     ///   - failure: Callback on failure
-    public func get(token: String, spacerIds: [String], success: @escaping ([SPRLockerModel]) -> Void, failure: @escaping (SPRError) -> Void) {
-        let reqData = SPRLockersGetReqData(spacerIds: spacerIds)
+    public func getLockers(token: String, spacerIds: [String], success: @escaping ([SPRLockerModel]) -> Void, failure: @escaping (SPRError) -> Void) {
+        let reqData = SPRLockerListGetReqData(spacerIds: spacerIds)
 
         API.post(
-            path: ApiPaths.lockerSpacerGet,
+            path: ApiPaths.lockerSpacerList,
             token: token,
             reqData: reqData,
-            success: { (response: SPRLockersGetResData) in
+            success: { (response: SPRLockerListGetResData) in
                 guard let spacersResData = response.spacers else { return failure(SPRError.ApiFailed) }
                 let spacers = spacersResData.map { $0.toModel() }.sorted(by: { $0.id < $1.id })
                 success(spacers)

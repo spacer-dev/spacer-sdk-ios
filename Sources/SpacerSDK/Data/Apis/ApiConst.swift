@@ -24,7 +24,7 @@ enum ApiPaths {
     static let myLockerReserveCancel = "myLocker/reserveCancel"
     static let myLockerShareUrlKey = "myLocker/shared"
     static let myMaintenanceLockerGet = "myLocker/maintenance/get"
-    static let lockerSpacerGet = "locker/spacer/get"
+    static let lockerSpacerList = "locker/spacer/list"
     static let lockerSpacer = "locker/spacer/"
     static let lockerUnitGet = "locker/unit/get"
     static let LocationGet = "location/get"
