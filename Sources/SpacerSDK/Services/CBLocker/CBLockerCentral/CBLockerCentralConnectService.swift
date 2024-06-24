@@ -83,6 +83,8 @@ class CBLockerCentralConnectService: NSObject {
     }
     
     private func connectWithRetry(locker: CBLockerModel, retryNum: Int = 0) {
+        print("意図的にconnect前で失敗しました")
+        return failure(SPRError.CBConnectingFailed)
         print("connectWithRetry：\(retryNum + 1)回目")
         if retryNum == 1, isHttpSupported {
             requestLocation()
