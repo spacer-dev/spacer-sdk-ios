@@ -18,22 +18,20 @@ class CBLockerCentralConnectService: NSObject {
     private var success: () -> Void = {}
     private var readSuccess: (String) -> Void = { _ in }
     private var failure: (SPRError) -> Void = { _ in }
+    private var sprError: SPRError?
     
     private let sprLockerService = SPR.sprLockerService()
     private let httpLockerService = HttpLockerService()
-    private var isHttpSupported = false
     private var centralService: CBLockerCentralService?
-    private var isCanceled = false
     private var locationManager = CLLocationManager()
-    // 位置情報が複数回更新されることを防ぐためのフラグ
+    private var isHttpSupported = false
+    private var isCanceled = false
     private var isRequestingLocation = false
-    private var sprError: SPRError?
     
     override init() {
         super.init()
         self.centralService = CBLockerCentralService(delegate: self)
         locationManager.delegate = self
-        // 位置データの精度を最大にする（NOTE:最大にするデメリットとして利用できるまでの時間が長くなる）
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
     }
     
@@ -141,26 +139,22 @@ class CBLockerCentralConnectService: NSObject {
         centralService?.connect(peripheral: peripheral)
     }
     
-    private func checkHttpAvailable(error: SPRError? = nil, callBack: @escaping () -> Void) {
-        print(":readAPI開始")
+    private func checkHttpAvailable(callBack: @escaping () -> Void) {
+        print("readAPI開始")
         sprLockerService.getLocker(
             token: token,
             spacerId: spacerId,
             success: { spacer in
                 if spacer.isHttpSupported {
                     self.isHttpSupported = true
-                    // 位置情報サービスのステータスを確認
                     let status = CLLocationManager.authorizationStatus()
                     
                     switch status {
                     case .notDetermined:
-                        // 未確定の場合 → ユーザーにアプリの使用中に位置情報サービスを使用する許可をリクエスト
                         self.locationManager.requestWhenInUseAuthorization()
                     case .denied, .restricted:
-                        // 拒否されている場合 → ダイアログ表示
                         self.showLocationPermissionAlert()
                     case .authorizedWhenInUse, .authorizedAlways:
-                        // 許可されている場合 → 何もしない
                         break
                     @unknown default:
                         break
@@ -173,7 +167,6 @@ class CBLockerCentralConnectService: NSObject {
     }
     
     func requestLocation() {
-        // 位置情報が複数回更新されるのを防ぐ仕様
         if !isRequestingLocation {
             isRequestingLocation = true
             locationManager.requestLocation()
@@ -192,7 +185,6 @@ class CBLockerCentralConnectService: NSObject {
             preferredStyle: .alert
         )
         let settingsAction = UIAlertAction(title: "設定へ移動", style: .default) { _ in
-            // 設定アプリを開く
             if let url = URL(string: UIApplication.openSettingsURLString) {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
             }
@@ -239,13 +231,12 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
         }
     }
 
-    // スキャンができる状態でない場合、検出失敗した場合、接続失敗した場合
     func failureIfNotCanceled(_ error: SPRError) {
         centralService?.stopScan()
         if isHttpSupported {
             sprError = error
             requestLocation()
-        } else {
+        } else if !isCanceled {
             isCanceled = true
             failure(error)
         }
@@ -253,9 +244,8 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
 }
 
 extension CBLockerCentralConnectService: CLLocationManagerDelegate {
-    // 現在地取得成功
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.first {
+        if let location = locations.last {
             let lat = location.coordinate.latitude
             let lng = location.coordinate.longitude
             
@@ -294,7 +284,6 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
         }
     }
     
-    // 現在地取得失敗
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         isRequestingLocation = false
         print("現在地取得失敗: \(error)")
