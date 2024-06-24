@@ -19,6 +19,7 @@ class CBLockerCentralConnectService: NSObject {
     private var readSuccess: (String) -> Void = { _ in }
     private var failure: (SPRError) -> Void = { _ in }
     private var sprError: SPRError?
+    private var checkHttpAvailableCallBack: () -> Void = {}
     
     private let sprLockerService = SPR.sprLockerService()
     private let httpLockerService = HttpLockerService()
@@ -85,8 +86,8 @@ class CBLockerCentralConnectService: NSObject {
     private func connectWithRetry(locker: CBLockerModel, retryNum: Int = 0) {
         print("connectWithRetry：\(retryNum + 1)回目")
         if retryNum == 1, isHttpSupported {
+            sprError = SPRError.CBConnectingFailed
             requestLocation()
-            print("connectWithRetry時点のisHttpSupported:\(isHttpSupported)")
             return
         }
         print("connectWithRetry：BLE通信開始")
@@ -150,6 +151,7 @@ class CBLockerCentralConnectService: NSObject {
                 if spacer.isHttpSupported {
                     self.isHttpSupported = true
                     let status = CLLocationManager.authorizationStatus()
+                    self.checkHttpAvailableCallBack = callBack
                     
                     switch status {
                     case .notDetermined:
@@ -162,7 +164,6 @@ class CBLockerCentralConnectService: NSObject {
                         break
                     }
                 }
-                callBack()
             },
             failure: { _ in callBack() }
         )
@@ -294,5 +295,9 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
         if let sprError = sprError {
             failure(sprError)
         }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        checkHttpAvailableCallBack()
     }
 }
