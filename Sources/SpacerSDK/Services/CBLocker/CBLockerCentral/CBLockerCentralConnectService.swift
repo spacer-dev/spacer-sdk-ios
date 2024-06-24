@@ -159,7 +159,7 @@ class CBLockerCentralConnectService: NSObject {
                     case .denied, .restricted:
                         self.showLocationPermissionAlert()
                     case .authorizedWhenInUse, .authorizedAlways:
-                        break
+                        callBack()
                     @unknown default:
                         break
                     }
@@ -192,7 +192,7 @@ class CBLockerCentralConnectService: NSObject {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)
             }
         }
-        let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel, handler: nil)
+        let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel, handler: {_ in self.checkHttpAvailableCallBack()})
         alertController.addAction(settingsAction)
         alertController.addAction(cancelAction)
         rootViewController.present(alertController, animated: true, completion: nil)
