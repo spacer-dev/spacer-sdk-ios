@@ -83,8 +83,6 @@ class CBLockerCentralConnectService: NSObject {
     }
     
     private func connectWithRetry(locker: CBLockerModel, retryNum: Int = 0) {
-        print("意図的にconnect前で失敗しました")
-        return failure(SPRError.CBConnectingFailed)
         print("connectWithRetry：\(retryNum + 1)回目")
         if retryNum == 1, isHttpSupported {
             requestLocation()
@@ -95,7 +93,8 @@ class CBLockerCentralConnectService: NSObject {
         guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
         let peripheralDelegate =
             CBLockerPeripheralService.Factory.create(
-                type: type, token: token, locker: locker, isRetry: retryNum > 0, success: {
+                type: type, token: token, locker: locker, isRetry: retryNum > 0,
+                success: {
                     self.success()
                     self.disconnect(locker: locker)
                 },
@@ -113,7 +112,8 @@ class CBLockerCentralConnectService: NSObject {
 
         locker.peripheral?.delegate = delegate
         delegate.startConnectingAndDiscoveringServices()
-        centralService?.connect(peripheral: peripheral)
+        print("connectを行わない。これによってconnectのタイムアウトが発生する。")
+//        centralService?.connect(peripheral: peripheral)
     }
     
     private func connectWithRetryByRead(locker: CBLockerModel, retryNum: Int = 0) {
