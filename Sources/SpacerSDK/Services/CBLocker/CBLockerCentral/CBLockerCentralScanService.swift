@@ -35,6 +35,7 @@ class CBLockerCentralScanService: NSObject {
         sprLockerService.getLockers(
             token: token,
             spacerIds: spacerIds,
+            lockers: lockers,
             success: successIfNotCanceled,
             failure: failureIfNotCanceled)
     }
@@ -50,10 +51,18 @@ extension CBLockerCentralScanService: CBLockerCentralDelegate {
         return !lockers.isEmpty
     }
 
-    func successIfNotCanceled(sprLockers: [SPRLockerModel]) {
+    func successIfNotCanceled(sprLockers: [SPRLockerModel], lockers: [CBLockerModel]) {
         centralService?.stopScan()
 
+        var sprLockers = sprLockers
         if !isCanceled {
+            lockers.forEach { locker in
+                sprLockers.enumerated().forEach { index, sprLocker in
+                    if sprLocker.id == locker.id {
+                        sprLockers[index].isScanned = true
+                    }
+                }
+            }
             isCanceled = true
             success(sprLockers)
         }

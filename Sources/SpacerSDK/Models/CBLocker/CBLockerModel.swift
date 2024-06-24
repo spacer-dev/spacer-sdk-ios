@@ -10,6 +10,7 @@ import Foundation
 
 public struct CBLockerModel: Identifiable {
     public var id: String
+    public var isScanned = false
     private(set) var status: CBLockerStatus = .none
     private(set) var readData: String = ""
     private(set) var peripheral: CBPeripheral?

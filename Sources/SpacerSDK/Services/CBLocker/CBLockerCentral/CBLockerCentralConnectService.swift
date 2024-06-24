@@ -224,6 +224,8 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     
     func successIfNotCanceled(locker: CBLockerModel) {
         centralService?.stopScan()
+        var locker = locker
+        locker.isScanned = true
 
         if !isCanceled {
             isCanceled = true

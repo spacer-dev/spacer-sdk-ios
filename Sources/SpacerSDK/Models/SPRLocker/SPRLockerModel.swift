@@ -16,9 +16,10 @@ public struct SPRLockerModel: Identifiable {
     public var doorStatus: String
     public var doorStatusExpiredAt: String?
     public var isHttpSupported: Bool
+    public var isScanned = false
 
     public var description: String {
-        return "id:\(id),status:\(status),size:\(size),closedWait:\(closedWait),version:\(version),doorStatus:\(doorStatus),doorStatusExpiredAt:\(doorStatusExpiredAt ?? ""),isHttpSupported:\(isHttpSupported)\n"
+        return "id:\(id),status:\(status),size:\(size),closedWait:\(closedWait),version:\(version),doorStatus:\(doorStatus),doorStatusExpiredAt:\(doorStatusExpiredAt ?? ""),isHttpSupported:\(isHttpSupported),isScanned:\(isScanned)\n"
     }
 }
 
