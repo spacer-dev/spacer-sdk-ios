@@ -267,7 +267,7 @@ struct ListView: View {
 
         AppControl.shared.showLoading()
 
-        sprLockerService.get(
+        sprLockerService.getLockers(
             token: token,
             spacerIds: spacerIds,
             success: { sprLockers in
