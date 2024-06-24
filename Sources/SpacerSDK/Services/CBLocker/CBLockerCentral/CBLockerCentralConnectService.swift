@@ -143,7 +143,7 @@ class CBLockerCentralConnectService: NSObject {
     }
     
     private func checkHttpAvailable(error: SPRError? = nil, callBack: @escaping () -> Void) {
-        print("HTTP:readAPI開始")
+        print(":readAPI開始")
         sprLockerService.getLocker(
             token: token,
             spacerId: spacerId,
