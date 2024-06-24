@@ -6,10 +6,9 @@
 //
 
 import CoreBluetooth
-import Foundation
 import CoreLocation
+import Foundation
 import UIKit
-
 
 class CBLockerCentralConnectService: NSObject {
     private var token: String!
@@ -35,7 +34,7 @@ class CBLockerCentralConnectService: NSObject {
         self.centralService = CBLockerCentralService(delegate: self)
         locationManager.delegate = self
         // 位置データの精度を最大にする（NOTE:最大にするデメリットとして利用できるまでの時間が長くなる）
-        self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
     }
     
     private func scan() {

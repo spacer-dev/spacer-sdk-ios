@@ -19,7 +19,7 @@ class CBLockerCentralService: NSObject {
     private var scanSeconds = CBLockerConst.ScanSeconds
     private var delegate: CBLockerCentralDelegate
     private var scanningCnt = 0
-    
+
     private var centralManager: CBCentralManager?
     var lockers = [CBLockerModel]()
 
@@ -35,7 +35,7 @@ class CBLockerCentralService: NSObject {
         centralManager = CBCentralManager(delegate: self, queue: nil)
         postDelayed()
     }
-    
+
     private func postDelayed() {
         DispatchQueue.main.asyncAfter(deadline: .now() + scanSeconds) { [self] in
             scanningCnt += 1

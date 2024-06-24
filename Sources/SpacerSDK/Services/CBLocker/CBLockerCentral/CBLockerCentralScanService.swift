@@ -26,7 +26,7 @@ class CBLockerCentralScanService: NSObject {
         self.token = token
         self.success = success
         self.failure = failure
-        
+
         centralService?.startScan()
     }
 
