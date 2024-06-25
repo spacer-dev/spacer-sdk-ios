@@ -193,6 +193,9 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
 
         finishReadingValueFromCharacteristic()
         
+        print("意図的にreadを失敗させる： \(String(describing: error))")
+        return failureIfNotCanceled(SPRError.CBReadingCharacteristicFailed)
+        
         guard error == nil else {
             print("peripheral didUpdateValueFor failed with error: \(String(describing: error))")
             return failureIfNotCanceled(SPRError.CBReadingCharacteristicFailed)
