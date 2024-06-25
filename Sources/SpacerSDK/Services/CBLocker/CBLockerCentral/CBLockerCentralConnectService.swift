@@ -19,7 +19,6 @@ class CBLockerCentralConnectService: NSObject {
     private var readSuccess: (String) -> Void = { _ in }
     private var failure: (SPRError) -> Void = { _ in }
     private var sprError: SPRError?
-    private var checkHttpAvailableCallBack: () -> Void = {}
     
     private let sprLockerService = SPR.sprLockerService()
     private let httpLockerService = HttpLockerService()
@@ -47,8 +46,8 @@ class CBLockerCentralConnectService: NSObject {
         self.connectable = { locker in self.connectWithRetry(locker: locker) }
         self.success = success
         self.failure = failure
-
-        checkHttpAvailable { self.scan() }
+        
+        scan()
     }
     
     func take(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
@@ -59,7 +58,7 @@ class CBLockerCentralConnectService: NSObject {
         self.success = success
         self.failure = failure
 
-        checkHttpAvailable { self.scan() }
+        scan()
     }
     
     func openForMaintenance(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
@@ -70,7 +69,7 @@ class CBLockerCentralConnectService: NSObject {
         self.success = success
         self.failure = failure
 
-        checkHttpAvailable { self.scan() }
+        scan()
     }
     
     func read(spacerId: String, success: @escaping (String) -> Void, failure: @escaping (SPRError) -> Void) {
@@ -141,8 +140,8 @@ class CBLockerCentralConnectService: NSObject {
         delegate.startConnectingAndDiscoveringServices()
         centralService?.connect(peripheral: peripheral)
     }
-    
-    private func checkHttpAvailable(callBack: @escaping () -> Void) {
+        
+    private func checkHttpAvailable(locker: CBLockerModel? = nil) {
         print("readAPI開始")
         sprLockerService.getLocker(
             token: token,
@@ -150,22 +149,16 @@ class CBLockerCentralConnectService: NSObject {
             success: { spacer in
                 if spacer.isHttpSupported {
                     self.isHttpSupported = true
-                    let status = CLLocationManager.authorizationStatus()
-                    self.checkHttpAvailableCallBack = callBack
-                    
-                    switch status {
-                    case .notDetermined:
-                        self.locationManager.requestWhenInUseAuthorization()
-                    case .denied, .restricted:
-                        self.showLocationPermissionAlert()
-                    case .authorizedWhenInUse, .authorizedAlways:
-                        callBack()
-                    @unknown default:
-                        break
+                    if let locker = locker {
+                        self.connectable(locker)
+                    } else {
+                        self.requestLocation()
                     }
+                } else {
+                    self.requestLocation()
                 }
             },
-            failure: { _ in callBack() }
+            failure: { error in self.failure(error) }
         )
     }
     
@@ -174,28 +167,6 @@ class CBLockerCentralConnectService: NSObject {
             isRequestingLocation = true
             locationManager.requestLocation()
         }
-    }
-    
-    func showLocationPermissionAlert() {
-        guard let window = UIApplication.shared.windows.first,
-              let rootViewController = window.rootViewController
-        else {
-            return
-        }
-        let alertController = UIAlertController(
-            title: "位置情報の利用許可が必要です",
-            message: "設定アプリで位置情報の利用を許可してください。",
-            preferredStyle: .alert
-        )
-        let settingsAction = UIAlertAction(title: "設定へ移動", style: .default) { _ in
-            if let url = URL(string: UIApplication.openSettingsURLString) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            }
-        }
-        let cancelAction = UIAlertAction(title: "キャンセル", style: .cancel, handler: {_ in self.checkHttpAvailableCallBack()})
-        alertController.addAction(settingsAction)
-        alertController.addAction(cancelAction)
-        rootViewController.present(alertController, animated: true, completion: nil)
     }
     
     private func retryOrFailure(error: SPRError, locker: CBLockerModel, retryNum: Int, executable: @escaping () -> Void) {
@@ -227,23 +198,26 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     
     func successIfNotCanceled(locker: CBLockerModel) {
         centralService?.stopScan()
-        var locker = locker
-        locker.isScanned = true
-
+        
         if !isCanceled {
+            var locker = locker
+            locker.isScanned = true
             isCanceled = true
-            connectable(locker)
+            checkHttpAvailable(locker: locker)
         }
     }
 
     func failureIfNotCanceled(_ error: SPRError) {
         centralService?.stopScan()
-        if isHttpSupported {
-            sprError = error
-            requestLocation()
-        } else if !isCanceled {
+        
+        if !isCanceled {
             isCanceled = true
-            failure(error)
+            if type == .read {
+                failure(error)
+            } else {
+                checkHttpAvailable()
+                sprError = error
+            }
         }
     }
 }
@@ -295,9 +269,5 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
         if let sprError = sprError {
             failure(sprError)
         }
-    }
-    
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        checkHttpAvailableCallBack()
     }
 }
