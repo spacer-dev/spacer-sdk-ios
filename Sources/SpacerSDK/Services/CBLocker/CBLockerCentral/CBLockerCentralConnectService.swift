@@ -112,8 +112,7 @@ class CBLockerCentralConnectService: NSObject {
 
         locker.peripheral?.delegate = delegate
         delegate.startConnectingAndDiscoveringServices()
-        print("connectを行わない。これによってconnectのタイムアウトが発生する。")
-//        centralService?.connect(peripheral: peripheral)
+        centralService?.connect(peripheral: peripheral)
     }
     
     private func connectWithRetryByRead(locker: CBLockerModel, retryNum: Int = 0) {
