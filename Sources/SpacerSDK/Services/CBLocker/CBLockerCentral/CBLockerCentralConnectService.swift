@@ -211,9 +211,9 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
         centralService?.stopScan()
         
         if !isCanceled {
+            isCanceled = true
             var locker = locker
             locker.isScanned = true
-            isCanceled = true
             if type == .read {
                 connectable(locker)
             } else {
