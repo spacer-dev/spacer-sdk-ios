@@ -27,6 +27,15 @@ class CBLockerCentralConnectService: NSObject {
     private var isHttpSupported = false
     private var isCanceled = false
     private var isRequestingLocation = false
+    private var hasBLERetried = false
+    private let httpFallbackErrors = [
+        SPRError.CBServiceNotFound,
+        SPRError.CBCharacteristicNotFound,
+        SPRError.CBReadingCharacteristicFailed,
+        SPRError.CBConnectStartTimeout,
+        SPRError.CBConnectDiscoverTimeout,
+        SPRError.CBConnectReadTimeoutBeforeWrite
+    ]
     
     override init() {
         super.init()
@@ -84,11 +93,6 @@ class CBLockerCentralConnectService: NSObject {
     
     private func connectWithRetry(locker: CBLockerModel, retryNum: Int = 0) {
         print("connectWithRetry：\(retryNum + 1)回目")
-        if retryNum == 1, isHttpSupported {
-            sprError = SPRError.CBConnectingFailed
-            requestLocation()
-            return
-        }
         print("connectWithRetry：BLE通信開始")
         guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
         let peripheralDelegate =
@@ -99,12 +103,18 @@ class CBLockerCentralConnectService: NSObject {
                     self.disconnect(locker: locker)
                 },
                 failure: { error in
-                    self.retryOrFailure(
-                        error: error,
-                        locker: locker,
-                        retryNum: retryNum + 1,
-                        executable: { self.connectWithRetry(locker: locker, retryNum: retryNum + 1) }
-                    )
+                    let status = CLLocationManager.authorizationStatus()
+                    let isPermitted = status == .authorizedAlways || status == .authorizedWhenInUse
+                    if self.isHttpSupported, !self.hasBLERetried, self.httpFallbackErrors.contains(error), isPermitted {
+                        self.requestLocation()
+                    } else {
+                        self.retryOrFailure(
+                            error: error,
+                            locker: locker,
+                            retryNum: retryNum + 1,
+                            executable: { self.connectWithRetry(locker: locker, retryNum: retryNum + 1) }
+                        )
+                    }
                 }
             )
 
@@ -170,6 +180,7 @@ class CBLockerCentralConnectService: NSObject {
     
     private func retryOrFailure(error: SPRError, locker: CBLockerModel, retryNum: Int, executable: @escaping () -> Void) {
         if retryNum < CBLockerConst.MaxRetryNum {
+            hasBLERetried = true
             executable()
         } else {
             failure(error)
@@ -219,6 +230,41 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
             }
         }
     }
+    
+    func httpLockerServices(lat: Double?, lng: Double?) {
+        if type == .put {
+            print("HTTP:預入API")
+            httpLockerService.put(
+                token: token,
+                spacerId: spacerId,
+                lat: lat,
+                lng: lng,
+                success: success,
+                failure: { error in self.failure(error) }
+            )
+        } else if type == .take {
+            print("HTTP:取出API")
+            httpLockerService.take(
+                token: token,
+                spacerId: spacerId,
+                lat: lat,
+                lng: lng,
+                success: success,
+                failure: { error in self.failure(error) }
+            )
+        } else if type == .openForMaintenance {
+            print("HTTP:メンテナンス取出API")
+            httpLockerService.openForMaintenance(
+                token: token,
+                spacerId: spacerId,
+                lat: lat,
+                lng: lng,
+                success: success,
+                failure: { error in self.failure(error) }
+            )
+        }
+        isRequestingLocation = false
+    }
 }
 
 extension CBLockerCentralConnectService: CLLocationManagerDelegate {
@@ -226,47 +272,13 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
         if let location = locations.last {
             let lat = location.coordinate.latitude
             let lng = location.coordinate.longitude
-            
-            if type == .put {
-                print("HTTP:預入API")
-                httpLockerService.put(
-                    token: token,
-                    spacerId: spacerId,
-                    lat: lat,
-                    lng: lng,
-                    success: success,
-                    failure: { error in self.failure(error) }
-                )
-            } else if type == .take {
-                print("HTTP:取出API")
-                httpLockerService.take(
-                    token: token,
-                    spacerId: spacerId,
-                    lat: lat,
-                    lng: lng,
-                    success: success,
-                    failure: { error in self.failure(error) }
-                )
-            } else if type == .openForMaintenance {
-                print("HTTP:メンテナンス取出API")
-                httpLockerService.openForMaintenance(
-                    token: token,
-                    spacerId: spacerId,
-                    lat: lat,
-                    lng: lng,
-                    success: success,
-                    failure: { error in self.failure(error) }
-                )
-            }
-            isRequestingLocation = false
+            httpLockerServices(lat: lat, lng: lng)
         }
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         isRequestingLocation = false
         print("現在地取得失敗: \(error)")
-        if let sprError = sprError {
-            failure(sprError)
-        }
+        httpLockerServices(lat: nil, lng: nil)
     }
 }

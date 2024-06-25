@@ -16,7 +16,7 @@ public class HttpLockerService {
     ///   - lng: User current location longitude, ex)  "209.004948393847015"
     ///   - success: Callback on success
     ///   - failure: Callback on failure
-    public func put(token: String, spacerId: String, lat: Double, lng: Double, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+    public func put(token: String, spacerId: String, lat: Double?, lng: Double?, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         let reqData = HttpLockerReqData(spacerId: spacerId, lat: lat, lng: lng)
 
         API.post(
@@ -35,7 +35,7 @@ public class HttpLockerService {
     ///   - lng: User current location longitude, ex)  "209.004948393847015"
     ///   - success: Callback on success
     ///   - failure: Callback on failure
-    public func take(token: String, spacerId: String, lat: Double, lng: Double, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+    public func take(token: String, spacerId: String, lat: Double?, lng: Double?, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         let reqData = HttpLockerReqData(spacerId: spacerId, lat: lat, lng: lng)
 
         API.post(
@@ -54,7 +54,7 @@ public class HttpLockerService {
     ///   - lng: User current location longitude, ex)  "209.004948393847015"
     ///   - success: Callback on success
     ///   - failure: Callback on failure
-    public func openForMaintenance(token: String, spacerId: String, lat: Double, lng: Double, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+    public func openForMaintenance(token: String, spacerId: String, lat: Double?, lng: Double?, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         let reqData = HttpLockerReqData(spacerId: spacerId, lat: lat, lng: lng)
 
         API.post(

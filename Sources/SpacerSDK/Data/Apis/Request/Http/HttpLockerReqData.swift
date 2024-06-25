@@ -9,14 +9,15 @@ import Foundation
 
 struct HttpLockerReqData: IReqData {
     var spacerId: String
-    var lat: Double
-    var lng: Double
+    var lat: Double?
+    var lng: Double?
 
     func toParams() -> [String: Any] {
-        [
-            "spacerId": spacerId,
-            "lat": lat,
-            "lng": lng,
-        ]
+        var params: [String: Any] = ["spacerId": spacerId]
+        if let lat = lat, let lng = lng {
+            params["lat"] = lat
+            params["lng"] = lng
+        }
+        return params
     }
 }
