@@ -165,7 +165,9 @@ class CBLockerCentralConnectService: NSObject {
                         self.requestLocation()
                     }
                 } else {
-                    self.requestLocation()
+                    if let locker = locker {
+                        self.connectable(locker)
+                    }
                 }
             },
             failure: { error in self.failure(error) }
