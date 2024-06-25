@@ -214,7 +214,11 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
             var locker = locker
             locker.isScanned = true
             isCanceled = true
-            checkHttpAvailable(locker: locker)
+            if type == .read {
+                connectable(locker)
+            } else {
+                checkHttpAvailable(locker: locker)
+            }
         }
     }
 
