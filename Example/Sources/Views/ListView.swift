@@ -7,6 +7,7 @@
 
 import SpacerSDK
 import SwiftUI
+import CoreLocation
 
 struct ListView: View {
     private let token = ProcessInfo.processInfo.environment["SDK_TOKEN"] ?? ""
@@ -21,7 +22,7 @@ struct ListView: View {
 
     @State private var showingAlert: AlertItem?
     
-    override init() {
+    init() {
         locationManager.requestWhenInUseAuthorization()
     }
 
