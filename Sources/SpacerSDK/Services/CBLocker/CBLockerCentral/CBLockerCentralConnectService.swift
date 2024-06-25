@@ -280,6 +280,9 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         print("現在地取得失敗: \(error)")
-        httpLockerServices(lat: nil, lng: nil)
+        if !isExecutingHttpService {
+            isExecutingHttpService = true
+            httpLockerServices(lat: nil, lng: nil)
+        }
     }
 }
