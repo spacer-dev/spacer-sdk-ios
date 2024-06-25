@@ -15,10 +15,15 @@ struct ListView: View {
     private let sprLockerService = SPR.sprLockerService()
     private let myLockerService = SPR.myLockerService()
     private let locationService = SPR.locationService()
+    private let locationManager = CLLocationManager()
 
     private let vStackSpacing: CGFloat = 10.0
 
     @State private var showingAlert: AlertItem?
+    
+    override init() {
+        locationManager.requestWhenInUseAuthorization()
+    }
 
     var body: some View {
         TabView {
