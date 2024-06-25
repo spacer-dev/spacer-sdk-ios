@@ -26,7 +26,7 @@ class CBLockerCentralConnectService: NSObject {
     private var locationManager = CLLocationManager()
     private var isHttpSupported = false
     private var isCanceled = false
-    private var isRequestingLocation = false
+    private var isExecutingHttpService = false
     private var hasBLERetried = false
     private let httpFallbackErrors = [
         SPRError.CBServiceNotFound,
@@ -106,7 +106,7 @@ class CBLockerCentralConnectService: NSObject {
                     let status = CLLocationManager.authorizationStatus()
                     let isPermitted = status == .authorizedAlways || status == .authorizedWhenInUse
                     if self.isHttpSupported, !self.hasBLERetried, self.httpFallbackErrors.contains(error), isPermitted {
-                        self.requestLocation()
+                        self.locationManager.requestLocation()
                     } else {
                         self.retryOrFailure(
                             error: error,
@@ -162,7 +162,7 @@ class CBLockerCentralConnectService: NSObject {
                     if let locker = locker {
                         self.connectable(locker)
                     } else {
-                        self.requestLocation()
+                        self.locationManager.requestLocation()
                     }
                 } else {
                     if let locker = locker {
@@ -172,13 +172,6 @@ class CBLockerCentralConnectService: NSObject {
             },
             failure: { error in self.failure(error) }
         )
-    }
-    
-    func requestLocation() {
-        if !isRequestingLocation {
-            isRequestingLocation = true
-            locationManager.requestLocation()
-        }
     }
     
     private func retryOrFailure(error: SPRError, locker: CBLockerModel, retryNum: Int, executable: @escaping () -> Void) {
@@ -270,7 +263,6 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
                 failure: { error in self.failure(error) }
             )
         }
-        isRequestingLocation = false
     }
 }
 
@@ -279,12 +271,14 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
         if let location = locations.last {
             let lat = location.coordinate.latitude
             let lng = location.coordinate.longitude
-            httpLockerServices(lat: lat, lng: lng)
+            if !isExecutingHttpService {
+                isExecutingHttpService = true
+                httpLockerServices(lat: lat, lng: lng)
+            }
         }
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        isRequestingLocation = false
         print("現在地取得失敗: \(error)")
         httpLockerServices(lat: nil, lng: nil)
     }
