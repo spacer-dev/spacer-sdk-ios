@@ -116,7 +116,8 @@ extension CBLockerCentralService: CBCentralManagerDelegate {
 
     public func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         print("BLE:接続成功")
-        peripheral.discoverServices([CBLockerConst.ServiceUUID])
+        print("ここで意図的にサービス検出（discover）を行わないようにする　これによりタイムアウトにより失敗する")
+//        peripheral.discoverServices([CBLockerConst.ServiceUUID])
     }
 }
 
