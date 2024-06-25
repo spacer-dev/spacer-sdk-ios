@@ -149,6 +149,11 @@ class CBLockerPeripheralService: NSObject {
 extension CBLockerPeripheralService: CBPeripheralDelegate {
     public func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         print("peripheral didDiscoverServices")
+        
+        if isRetry{
+            print("リトライ回数１以上：discover失敗")
+            return failureIfNotCanceled(SPRError.CBServiceNotFound)
+        }
 
         finishConnectingAndDiscoveringServices()
 
@@ -217,6 +222,11 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
         print("peripheral didWriteValueFor")
 
         finishWritingValueToCharacteristic()
+        
+        if !isRetry{
+            print("リトライ回数0：意図的にwrite失敗")
+            return failureIfNotCanceled(SPRError.CBWritingCharacteristicFailed)
+        }
 
         guard error == nil else {
             print("peripheral didWriteValueFor failed with error: \(String(describing: error))")
