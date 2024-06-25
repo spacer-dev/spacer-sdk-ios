@@ -18,7 +18,6 @@ class CBLockerCentralConnectService: NSObject {
     private var success: () -> Void = {}
     private var readSuccess: (String) -> Void = { _ in }
     private var failure: (SPRError) -> Void = { _ in }
-    private var sprError: SPRError?
     
     private let sprLockerService = SPR.sprLockerService()
     private let httpLockerService = HttpLockerService()
@@ -151,7 +150,7 @@ class CBLockerCentralConnectService: NSObject {
         centralService?.connect(peripheral: peripheral)
     }
         
-    private func checkHttpAvailable(locker: CBLockerModel? = nil) {
+    private func checkHttpAvailable(isScanned: Bool, locker: CBLockerModel? = nil, error: SPRError? = nil) {
         print("readAPI開始")
         sprLockerService.getLocker(
             token: token,
@@ -159,14 +158,16 @@ class CBLockerCentralConnectService: NSObject {
             success: { spacer in
                 if spacer.isHttpSupported {
                     self.isHttpSupported = true
-                    if let locker = locker {
+                    if isScanned, let locker = locker {
                         self.connectable(locker)
                     } else {
                         self.locationManager.requestLocation()
                     }
                 } else {
-                    if let locker = locker {
+                    if isScanned, let locker = locker {
                         self.connectable(locker)
+                    } else if let error = error {
+                        self.failure(error)
                     }
                 }
             },
@@ -212,7 +213,7 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
             if type == .read {
                 connectable(locker)
             } else {
-                checkHttpAvailable(locker: locker)
+                checkHttpAvailable(isScanned: true, locker: locker)
             }
         }
     }
@@ -225,8 +226,7 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
             if type == .read {
                 failure(error)
             } else {
-                checkHttpAvailable()
-                sprError = error
+                checkHttpAvailable(isScanned: false, error: error)
             }
         }
     }
