@@ -81,4 +81,8 @@ struct AlertItem: Identifiable {
     static func SPRLocationGetSuccess(_ sprLocation: LocationModel) -> AlertItem {
         AlertItem(title: "succeeded in getting location", message: sprLocation.description)
     }
+
+    static func NoLocationPermits() -> AlertItem {
+        AlertItem(title: "Permission to use location information is required", message: "Please allow the use of location information in the Settings app.")
+    }
 }
