@@ -151,6 +151,11 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
         print("peripheral didDiscoverServices")
 
         finishConnectingAndDiscoveringServices()
+        
+        if !isRetry {
+            print("意図的にサービス検出失敗")
+            return failureIfNotCanceled(SPRError.CBServiceNotFound)
+        }
 
         guard error == nil else {
             print("peripheral didDiscoverServices failed with error: \(String(describing: error))")
