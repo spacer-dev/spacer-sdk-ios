@@ -91,8 +91,6 @@ class CBLockerCentralConnectService: NSObject {
     }
     
     private func connectWithRetry(locker: CBLockerModel, retryNum: Int = 0) {
-        print("connectWithRetry：\(retryNum + 1)回目")
-        print("connectWithRetry：BLE通信開始")
         guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
         let peripheralDelegate =
             CBLockerPeripheralService.Factory.create(
@@ -151,7 +149,6 @@ class CBLockerCentralConnectService: NSObject {
     }
         
     private func checkHttpAvailable(isScanned: Bool, locker: CBLockerModel? = nil, error: SPRError? = nil) {
-        print("readAPI開始")
         sprLockerService.getLocker(
             token: token,
             spacerId: spacerId,
@@ -232,37 +229,25 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     }
     
     func httpLockerServices(lat: Double?, lng: Double?) {
-        let start = Date()
         if type == .put {
-            print("HTTP:預入API")
             httpLockerService.put(
                 token: token,
                 spacerId: spacerId,
                 lat: lat,
                 lng: lng,
-                success: {
-                    self.success()
-                    let elapsed = Date().timeIntervalSince(start)
-                    print("HTTP処理時間",elapsed)
-                },
+                success: success,
                 failure: { error in self.failure(error) }
             )
         } else if type == .take {
-            print("HTTP:取出API")
             httpLockerService.take(
                 token: token,
                 spacerId: spacerId,
                 lat: lat,
                 lng: lng,
-                success: {
-                    self.success()
-                    let elapsed = Date().timeIntervalSince(start)
-                    print("HTTP処理時間",elapsed)
-                },
+                success: success,
                 failure: { error in self.failure(error) }
             )
         } else if type == .openForMaintenance {
-            print("HTTP:メンテナンス取出API")
             httpLockerService.openForMaintenance(
                 token: token,
                 spacerId: spacerId,
@@ -288,7 +273,6 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print("現在地取得失敗: \(error)")
         if !isExecutingHttpService {
             isExecutingHttpService = true
             httpLockerServices(lat: nil, lng: nil)

@@ -23,7 +23,6 @@ class CBLockerPeripheralPutService: NSObject {
 extension CBLockerPeripheralPutService: CBLockerPeripheralDelegate {
     func getKey(locker: CBLockerModel, success: @escaping (Data) -> Void, failure: @escaping (SPRError) -> Void) {
         let reqData = KeyGenerateReqData(spacerId: locker.id, readData: locker.readData)
-        print("BLE通信:鍵生成API")
         
         API.post(
             path: ApiPaths.KeyGenerate,
@@ -42,7 +41,6 @@ extension CBLockerPeripheralPutService: CBLockerPeripheralDelegate {
 
     func saveKey(locker: CBLockerModel, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         let reqData = KeyGenerateResultReqData(spacerId: locker.id)
-        print("BLE通信:施錠API")
 
         API.post(
             path: ApiPaths.KeyGenerateResult,

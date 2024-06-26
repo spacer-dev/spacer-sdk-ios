@@ -22,7 +22,6 @@ class CBLockerPeripheralMaintenanceService: NSObject {
 extension CBLockerPeripheralMaintenanceService: CBLockerPeripheralDelegate {
     func getKey(locker: CBLockerModel, success: @escaping (Data) -> Void, failure: @escaping (SPRError) -> Void) {
         let reqData = MaintenanceKeyGetReqData(spacerId: locker.id)
-        print("BLE通信：メンテナンス鍵生成API")
 
         API.post(
             path: ApiPaths.MaintenanceKeyGet,
@@ -41,7 +40,6 @@ extension CBLockerPeripheralMaintenanceService: CBLockerPeripheralDelegate {
 
     func saveKey(locker: CBLockerModel, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         let reqData = MaintenanceKeyGetResultReqData(spacerId: locker.id)
-        print("BLE通信：メンテナンス施錠API")
 
         API.post(
             path: ApiPaths.MaintenanceKeyGetResult,

@@ -23,7 +23,7 @@ struct ListView: View {
     @State private var showingAlert: AlertItem?
     
     init() {
-        locationManager.requestWhenInUseAuthorization()
+        checkLocationPermission()
     }
 
     var body: some View {
@@ -110,6 +110,36 @@ struct ListView: View {
             }
         }
         .alert(item: $showingAlert) { item in item.alert }
+    }
+    
+    private func checkLocationPermission(){
+        let status = locationManager.authorizationStatus()
+        switch status {
+        case .notDetermined:
+            locationManager.requestWhenInUseAuthorization()
+        case .denied, .restricted:
+            showLocationPermissionAlert()
+        case .authorizedWhenInUse, .authorizedAlways:
+            break
+        @unknown default:
+            break
+    }
+    
+    private func showLocationPermissionAlert() {
+        let alertController = UIAlertController(
+            title: "Permission to use location information is required",
+            message: "Please allow the use of location information in the Settings app.",
+            preferredStyle: .alert
+        )
+        let settingsAction = UIAlertAction(title: "Go to Settings", style: .default) { _ in
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            }
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        alertController.addAction(settingsAction)
+        alertController.addAction(cancelAction)
+        self.present(alertController, animated: true, completion: nil)
     }
 
     private func failure(error: SPRError) {

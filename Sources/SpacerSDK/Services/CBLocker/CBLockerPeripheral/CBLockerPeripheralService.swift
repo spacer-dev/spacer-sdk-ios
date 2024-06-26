@@ -79,7 +79,6 @@ class CBLockerPeripheralService: NSObject {
         timeouts.discover.set()
 
         for service in services {
-            print("\(service)のCharacteristicsの検出開始")
             peripheral.discoverCharacteristics([CBLockerConst.CharacteristicUUID], for: service)
         }
     }
@@ -90,7 +89,6 @@ class CBLockerPeripheralService: NSObject {
 
     private func startReadingValueFromCharacteristic(peripheral: CBPeripheral, characteristic: CBCharacteristic) {
         timeouts.readBeforeWrite.set()
-        print("Characteristicsのvalueのread開始")
         peripheral.readValue(for: characteristic)
     }
 
@@ -107,7 +105,6 @@ class CBLockerPeripheralService: NSObject {
 
     private func startWritingValueToCharacteristic(peripheral: CBPeripheral, characteristic: CBCharacteristic, data: Data) {
         timeouts.write.set()
-        print("Characteristicsのvalueのwrite開始")
         peripheral.writeValue(data, for: characteristic, type: .withResponse)
     }
 
@@ -151,11 +148,6 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
         print("peripheral didDiscoverServices")
 
         finishConnectingAndDiscoveringServices()
-        
-        if !isRetry {
-            print("意図的にサービス検出失敗")
-            return failureIfNotCanceled(SPRError.CBServiceNotFound)
-        }
 
         guard error == nil else {
             print("peripheral didDiscoverServices failed with error: \(String(describing: error))")
