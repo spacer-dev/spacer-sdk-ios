@@ -8,7 +8,7 @@
 import Foundation
 
 class ApiConst {
-    static let TimeoutSec = 12.0
+    static let TimeoutSec = 10.0
     static var BaseURL = SPR.config.baseURL
     static let ApiType = SPR.config.apiType
 }
