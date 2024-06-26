@@ -232,6 +232,7 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     }
     
     func httpLockerServices(lat: Double?, lng: Double?) {
+        let start = Date()
         if type == .put {
             print("HTTP:預入API")
             httpLockerService.put(
@@ -239,7 +240,11 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
                 spacerId: spacerId,
                 lat: lat,
                 lng: lng,
-                success: success,
+                success: {
+                    self.success()
+                    let elapsed = Date().timeIntervalSince(start)
+                    print("HTTP処理時間",elapsed)
+                },
                 failure: { error in self.failure(error) }
             )
         } else if type == .take {
@@ -249,7 +254,11 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
                 spacerId: spacerId,
                 lat: lat,
                 lng: lng,
-                success: success,
+                success: {
+                    self.success()
+                    let elapsed = Date().timeIntervalSince(start)
+                    print("HTTP処理時間",elapsed)
+                },
                 failure: { error in self.failure(error) }
             )
         } else if type == .openForMaintenance {
