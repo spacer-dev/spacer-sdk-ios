@@ -121,8 +121,7 @@ class CBLockerCentralConnectService: NSObject {
 
         locker.peripheral?.delegate = delegate
         delegate.startConnectingAndDiscoveringServices()
-        print("接続を強制的にスキップし、意図的にタイムアウトを発生させる")
-//        centralService?.connect(peripheral: peripheral)
+        centralService?.connect(peripheral: peripheral)
 
     }
     
