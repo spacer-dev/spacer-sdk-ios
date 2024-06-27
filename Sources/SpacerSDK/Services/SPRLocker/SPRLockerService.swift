@@ -28,7 +28,7 @@ public class SPRLockerService {
             },
             failure: failure)
     }
-    
+
     /// Get multiple locker unit basic information
     /// - Parameters:
     ///   - token: User token created on the server
@@ -38,14 +38,13 @@ public class SPRLockerService {
     public func getLocker(token: String, spacerId: String, success: @escaping (SPRLockerModel) -> Void, failure: @escaping (SPRError) -> Void) {
         let reqData = SPRLockerGetReqData(spacerId: spacerId)
         let path = "\(ApiPaths.lockerSpacer)\(spacerId)"
-        
+
         API.get(
             path: path,
             token: token,
             reqData: reqData,
             success: { (response: SPRLockerGetResData) in
                 guard let spacer = response.spacer?.toModel() else { return failure(SPRError.ApiFailed) }
-//                let spacer = spacersResData.toModel()
                 success(spacer)
             },
             failure: failure)

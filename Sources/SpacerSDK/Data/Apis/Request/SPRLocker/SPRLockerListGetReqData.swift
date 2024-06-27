@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  SPRLockerListGetReqData.swift
 //
 //
 //  Created by ASW on 2024/06/24.

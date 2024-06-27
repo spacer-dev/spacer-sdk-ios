@@ -79,6 +79,7 @@ class CBLockerPeripheralService: NSObject {
         timeouts.discover.set()
 
         for service in services {
+            print(service)
             peripheral.discoverCharacteristics([CBLockerConst.CharacteristicUUID], for: service)
         }
     }
@@ -105,6 +106,7 @@ class CBLockerPeripheralService: NSObject {
 
     private func startWritingValueToCharacteristic(peripheral: CBPeripheral, characteristic: CBCharacteristic, data: Data) {
         timeouts.write.set()
+        
         peripheral.writeValue(data, for: characteristic, type: .withResponse)
     }
 

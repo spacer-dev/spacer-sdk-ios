@@ -120,7 +120,6 @@ class CBLockerCentralConnectService: NSObject {
         locker.peripheral?.delegate = delegate
         delegate.startConnectingAndDiscoveringServices()
         centralService?.connect(peripheral: peripheral)
-
     }
     
     private func connectWithRetryByRead(locker: CBLockerModel, retryNum: Int = 0) {
