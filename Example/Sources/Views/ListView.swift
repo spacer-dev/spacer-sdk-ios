@@ -44,7 +44,7 @@ struct ListView: View {
                             title: Strings.CBOpenForMaintenanceTitle, desc: Strings.CBOpenForMaintenanceDesc, textHint: Strings.CBOpenForMaintenanceTextHint, runnable: openForMaintenance
                         )
                         InputItemView(
-                            title: Strings.CBLockerReadTitle, desc: Strings.CBLockerReadDesc, textHint: Strings.CBLockerReadHint, runnable: read
+                            title: Strings.CBLockerReadTitle, desc: Strings.CBLockerReadDesc, textHint: Strings.CBLockerReadHint, runnable: checkDoorStatusAvailable
                         )
                     }
                     .padding()
@@ -203,6 +203,7 @@ struct ListView: View {
         AppControl.shared.showLoading()
 
         cbLockerService.checkDoorStatusAvailable(
+            token: token,
             spacerId: spacerId,
             success: { lockerAvailable in
                 AppControl.shared.hideLoading()

@@ -42,8 +42,8 @@ struct AlertItem: Identifiable {
         AlertItem(title: "succeeded in taking with \(urlKey)")
     }
     
-    static func CBLockerReadSuccess(_ readData: String) -> AlertItem {
-        AlertItem(title: "succeeded in reading", message: "\(readData)")
+    static func CBLockerReadSuccess(_ lockerAvailable: Bool) -> AlertItem {
+        AlertItem(title: "succeeded in reading", message: "\(lockerAvailable)")
     }
 
     static func MyLockerGetSuccess(_ myLockers: [MyLockerModel]) -> AlertItem {
