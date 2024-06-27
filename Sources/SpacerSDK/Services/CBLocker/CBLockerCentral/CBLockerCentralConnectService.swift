@@ -201,7 +201,7 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     
     func successIfNotCanceled(locker: CBLockerModel) {
         centralService?.stopScan()
-        
+
         if !isCanceled {
             isCanceled = true
             var locker = locker
@@ -216,7 +216,7 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
 
     func failureIfNotCanceled(_ error: SPRError) {
         centralService?.stopScan()
-        
+
         if !isCanceled {
             isCanceled = true
             if type == .read {

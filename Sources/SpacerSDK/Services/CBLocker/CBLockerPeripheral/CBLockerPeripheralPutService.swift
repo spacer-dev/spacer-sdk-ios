@@ -23,7 +23,7 @@ class CBLockerPeripheralPutService: NSObject {
 extension CBLockerPeripheralPutService: CBLockerPeripheralDelegate {
     func getKey(locker: CBLockerModel, success: @escaping (Data) -> Void, failure: @escaping (SPRError) -> Void) {
         let reqData = KeyGenerateReqData(spacerId: locker.id, readData: locker.readData)
-        
+
         API.post(
             path: ApiPaths.KeyGenerate,
             token: token,

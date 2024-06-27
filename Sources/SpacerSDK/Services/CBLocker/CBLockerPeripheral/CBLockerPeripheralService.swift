@@ -106,7 +106,7 @@ class CBLockerPeripheralService: NSObject {
 
     private func startWritingValueToCharacteristic(peripheral: CBPeripheral, characteristic: CBCharacteristic, data: Data) {
         timeouts.write.set()
-        
+
         peripheral.writeValue(data, for: characteristic, type: .withResponse)
     }
 
@@ -191,7 +191,7 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
         print("peripheral didUpdateValueFor")
 
         finishReadingValueFromCharacteristic()
-        
+
         guard error == nil else {
             print("peripheral didUpdateValueFor failed with error: \(String(describing: error))")
             return failureIfNotCanceled(SPRError.CBReadingCharacteristicFailed)
