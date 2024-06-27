@@ -125,8 +125,6 @@ extension CBLockerPeripheralReadService: CBPeripheralDelegate {
         print("peripheral didDiscoverCharacteristicsFor")
 
         finishDiscoveringCharacteristics()
-        
-        return checkIsHttpSupportedIfNotCanceled()
 
         guard error == nil else {
             print("peripheral didDiscoverCharacteristicsFor failed with error: \(String(describing: error))")
@@ -147,6 +145,8 @@ extension CBLockerPeripheralReadService: CBPeripheralDelegate {
         print("peripheral didUpdateValueFor")
 
         finishReadingValueFromCharacteristic()
+        
+        return checkIsHttpSupportedIfNotCanceled()
 
         guard error == nil else {
             print("peripheral didUpdateValueFor failed with error: \(String(describing: error))")
