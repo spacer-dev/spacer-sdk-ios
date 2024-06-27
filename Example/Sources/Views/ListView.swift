@@ -199,14 +199,14 @@ struct ListView: View {
         )
     }
     
-    private func read(spacerId: String) {
+    private func checkDoorStatusAvailable(spacerId: String) {
         AppControl.shared.showLoading()
-                
-        cbLockerService.read(
+
+        cbLockerService.checkDoorStatusAvailable(
             spacerId: spacerId,
-            success: { readData in
+            success: { lockerAvailable in
                 AppControl.shared.hideLoading()
-                showingAlert = AlertItem.CBLockerReadSuccess(readData)
+                showingAlert = AlertItem.CBLockerReadSuccess(lockerAvailable)
             },
             failure: failure
         )

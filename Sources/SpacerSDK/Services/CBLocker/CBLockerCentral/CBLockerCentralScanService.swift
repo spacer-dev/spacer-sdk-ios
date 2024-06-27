@@ -16,7 +16,7 @@ class CBLockerCentralScanService: NSObject {
     private var centralService: CBLockerCentralService?
     private var sprLockerService = SPRLockerService()
     private var isCanceled = false
-    private var scanedLockers:[CBLockerModel] = []
+    private var scannedLockers: [CBLockerModel] = []
 
     override init() {
         super.init()
@@ -32,7 +32,7 @@ class CBLockerCentralScanService: NSObject {
     }
 
     private func convertSprLockers(lockers: [CBLockerModel]) {
-        scanedLockers = lockers
+        scannedLockers = lockers
         let spacerIds = lockers.map { $0.id }
         sprLockerService.getLockers(
             token: token,
@@ -57,9 +57,9 @@ extension CBLockerCentralScanService: CBLockerCentralDelegate {
 
         var sprLockers = sprLockers
         if !isCanceled {
-            scanedLockers.forEach { scanedlocker in
+            scannedLockers.forEach { scannedlocker in
                 sprLockers.enumerated().forEach { index, sprLocker in
-                    if sprLocker.id == scanedlocker.id {
+                    if sprLocker.id == scannedlocker.id {
                         sprLockers[index].isScanned = true
                     }
                 }

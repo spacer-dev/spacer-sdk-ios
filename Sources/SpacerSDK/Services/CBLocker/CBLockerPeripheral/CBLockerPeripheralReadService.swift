@@ -10,15 +10,17 @@ import Foundation
 
 class CBLockerPeripheralReadService: NSObject {
     private var locker: CBLockerModel
-    private var success: (String) -> Void = { _ in }
-    private var failure: (SPRError) -> Void = { _ in }
+    private var success: (Bool) -> Void = { _ in }
+//    private var failure: (SPRError) -> Void = { _ in }
     private var isCanceled = false
     private var timeouts: CBLockerConnectTimeouts!
-
-    init(locker: CBLockerModel, success: @escaping (String) -> Void, failure: @escaping (SPRError) -> Void) {
+    private var notAvailableReadData = ["openedExpired", "openedNotExpired", "closedExpired", "false" ]
+    
+    init(locker: CBLockerModel, success: @escaping (Bool) -> Void) {
+//        init(locker: CBLockerModel, success: @escaping (Bool) -> Void, failure: @escaping (SPRError) -> Void) {
         self.locker = locker
         self.success = success
-        self.failure = failure
+//        self.failure = failure
 
         super.init()
 
@@ -59,24 +61,33 @@ class CBLockerPeripheralReadService: NSObject {
     }
 
     private func execTimeoutProcessing(error: SPRError) {
-        failureIfNotCanceled(error)
+        checkIsHttpSupportedIfNotCanceled()
+//        failureIfNotCanceled(error)
     }
 
-    private func successIfNotCanceled(readData: String) {
+    private func successIfNotCanceled(isDoorStatusAvailable: Bool) {
         if !isCanceled {
             isCanceled = true
             clearConnecting()
-            success(readData)
+            success(isDoorStatusAvailable)
         }
     }
-
-    private func failureIfNotCanceled(_ error: SPRError) {
+    
+    private func checkIsHttpSupportedIfNotCanceled(){
         if !isCanceled {
             isCanceled = true
             clearConnecting()
-            failure(error)
+            success(locker.isHttpSupported)
         }
     }
+
+//    private func failureIfNotCanceled(_ error: SPRError) {
+//        if !isCanceled {
+//            isCanceled = true
+//            clearConnecting()
+//            failure(error)
+//        }
+//    }
 
     private func clearConnecting() {
         timeouts.clearAll()
@@ -91,17 +102,20 @@ extension CBLockerPeripheralReadService: CBPeripheralDelegate {
 
         guard error == nil else {
             print("peripheral didDiscoverServices failed with error: \(String(describing: error))")
-            return failureIfNotCanceled(SPRError.CBServiceNotFound)
+            return checkIsHttpSupportedIfNotCanceled()
+//            return failureIfNotCanceled(SPRError.CBServiceNotFound)
         }
 
         guard let services = peripheral.services else {
             print("peripheral didDiscoverServices, services is nil")
-            return failureIfNotCanceled(SPRError.CBServiceNotFound)
+            return checkIsHttpSupportedIfNotCanceled()
+//            return failureIfNotCanceled(SPRError.CBServiceNotFound)
         }
 
         if services.isEmpty {
             print("peripheral didDiscoverServices, services is empty")
-            return failureIfNotCanceled(SPRError.CBServiceNotFound)
+            return checkIsHttpSupportedIfNotCanceled()
+//            return failureIfNotCanceled(SPRError.CBServiceNotFound)
         }
 
         startDiscoveringCharacteristics(peripheral: peripheral, services: services)
@@ -114,12 +128,14 @@ extension CBLockerPeripheralReadService: CBPeripheralDelegate {
 
         guard error == nil else {
             print("peripheral didDiscoverCharacteristicsFor failed with error: \(String(describing: error))")
-            return failureIfNotCanceled(SPRError.CBCharacteristicNotFound)
+            return checkIsHttpSupportedIfNotCanceled()
+//            return failureIfNotCanceled(SPRError.CBCharacteristicNotFound)
         }
 
         let characteristic = service.characteristics?.first
         guard let characteristic = characteristic else {
-            return failureIfNotCanceled(SPRError.CBCharacteristicNotFound)
+            return checkIsHttpSupportedIfNotCanceled()
+//            return failureIfNotCanceled(SPRError.CBCharacteristicNotFound)
         }
 
         startReadingValueFromCharacteristic(peripheral: peripheral, characteristic: characteristic)
@@ -132,16 +148,19 @@ extension CBLockerPeripheralReadService: CBPeripheralDelegate {
 
         guard error == nil else {
             print("peripheral didUpdateValueFor failed with error: \(String(describing: error))")
-            return failureIfNotCanceled(SPRError.CBReadingCharacteristicFailed)
+            return checkIsHttpSupportedIfNotCanceled()
+//            return failureIfNotCanceled(SPRError.CBReadingCharacteristicFailed)
         }
 
         guard let characteristicValue = characteristic.value else {
             print("peripheral didUpdateValueFor, characteristic value is nil")
-            return failureIfNotCanceled(SPRError.CBReadingCharacteristicFailed)
+            return checkIsHttpSupportedIfNotCanceled()
+//            return failureIfNotCanceled(SPRError.CBReadingCharacteristicFailed)
         }
 
         let readData = String(bytes: characteristicValue, encoding: String.Encoding.ascii) ?? ""
 
-        successIfNotCanceled(readData: readData)
+        let isDoorStatusAvailable = !notAvailableReadData.contains(readData)
+        successIfNotCanceled(isDoorStatusAvailable: isDoorStatusAvailable)
     }
 }

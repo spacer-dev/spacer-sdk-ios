@@ -1,8 +1,8 @@
 //
 //  SPRLockerGetResData.swift
-//  
 //
-//  Created by ASW on 2024/06/19.
+//
+//  Created by Takehito Soi on 2021/07/13.
 //
 
 import Foundation
