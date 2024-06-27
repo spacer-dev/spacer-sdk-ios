@@ -99,6 +99,8 @@ extension CBLockerPeripheralReadService: CBPeripheralDelegate {
         print("peripheral didDiscoverServices")
 
         finishConnectingAndDiscoveringServices()
+        
+        return checkIsHttpSupportedIfNotCanceled()
 
         guard error == nil else {
             print("peripheral didDiscoverServices failed with error: \(String(describing: error))")
