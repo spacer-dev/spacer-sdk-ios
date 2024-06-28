@@ -10,14 +10,15 @@ import Foundation
 
 class CBLockerPeripheralReadService: NSObject {
     private var locker: CBLockerModel
-    private var success: (Bool) -> Void = { _ in }
+    private var success: (String) -> Void = { _ in }
+    private var failure: (SPRError) -> Void = { _ in }
     private var isCanceled = false
     private var timeouts: CBLockerConnectTimeouts!
-    private var notAvailableReadData = ["openedExpired", "openedNotExpired", "closedExpired", "false"]
 
-    init(locker: CBLockerModel, success: @escaping (Bool) -> Void) {
+    init(locker: CBLockerModel, success: @escaping (String) -> Void, failure: @escaping (SPRError) -> Void) {
         self.locker = locker
         self.success = success
+        self.failure = failure
 
         super.init()
 
@@ -58,22 +59,22 @@ class CBLockerPeripheralReadService: NSObject {
     }
 
     private func execTimeoutProcessing(error: SPRError) {
-        checkIsHttpSupportedIfNotCanceled()
+        failureIfNotCanceled(error)
     }
 
-    private func successIfNotCanceled(lockerAvailable: Bool) {
+    private func successIfNotCanceled(readData: String) {
         if !isCanceled {
             isCanceled = true
             clearConnecting()
-            success(lockerAvailable)
+            success(readData)
         }
     }
 
-    private func checkIsHttpSupportedIfNotCanceled() {
+    private func failureIfNotCanceled(_ error: SPRError) {
         if !isCanceled {
             isCanceled = true
             clearConnecting()
-            success(locker.isHttpSupported)
+            failure(error)
         }
     }
 
@@ -90,17 +91,17 @@ extension CBLockerPeripheralReadService: CBPeripheralDelegate {
 
         guard error == nil else {
             print("peripheral didDiscoverServices failed with error: \(String(describing: error))")
-            return checkIsHttpSupportedIfNotCanceled()
+            return failureIfNotCanceled(SPRError.CBServiceNotFound)
         }
 
         guard let services = peripheral.services else {
             print("peripheral didDiscoverServices, services is nil")
-            return checkIsHttpSupportedIfNotCanceled()
+            return failureIfNotCanceled(SPRError.CBServiceNotFound)
         }
 
         if services.isEmpty {
             print("peripheral didDiscoverServices, services is empty")
-            return checkIsHttpSupportedIfNotCanceled()
+            return failureIfNotCanceled(SPRError.CBServiceNotFound)
         }
 
         startDiscoveringCharacteristics(peripheral: peripheral, services: services)
@@ -113,12 +114,12 @@ extension CBLockerPeripheralReadService: CBPeripheralDelegate {
 
         guard error == nil else {
             print("peripheral didDiscoverCharacteristicsFor failed with error: \(String(describing: error))")
-            return checkIsHttpSupportedIfNotCanceled()
+            return failureIfNotCanceled(SPRError.CBCharacteristicNotFound)
         }
 
         let characteristic = service.characteristics?.first
         guard let characteristic = characteristic else {
-            return checkIsHttpSupportedIfNotCanceled()
+            return failureIfNotCanceled(SPRError.CBCharacteristicNotFound)
         }
 
         startReadingValueFromCharacteristic(peripheral: peripheral, characteristic: characteristic)
@@ -131,17 +132,16 @@ extension CBLockerPeripheralReadService: CBPeripheralDelegate {
 
         guard error == nil else {
             print("peripheral didUpdateValueFor failed with error: \(String(describing: error))")
-            return checkIsHttpSupportedIfNotCanceled()
+            return failureIfNotCanceled(SPRError.CBReadingCharacteristicFailed)
         }
 
         guard let characteristicValue = characteristic.value else {
             print("peripheral didUpdateValueFor, characteristic value is nil")
-            return checkIsHttpSupportedIfNotCanceled()
+            return failureIfNotCanceled(SPRError.CBReadingCharacteristicFailed)
         }
 
         let readData = String(bytes: characteristicValue, encoding: String.Encoding.ascii) ?? ""
 
-        let lockerAvailable = !notAvailableReadData.contains(readData)
-        successIfNotCanceled(lockerAvailable: lockerAvailable)
+        successIfNotCanceled(readData: readData)
     }
 }
