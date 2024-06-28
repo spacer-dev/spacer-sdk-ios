@@ -7,6 +7,7 @@
 
 import SpacerSDK
 import SwiftUI
+import CoreLocation
 
 struct ListView: View {
     private let token = ProcessInfo.processInfo.environment["SDK_TOKEN"] ?? ""
@@ -15,6 +16,7 @@ struct ListView: View {
     private let sprLockerService = SPR.sprLockerService()
     private let myLockerService = SPR.myLockerService()
     private let locationService = SPR.locationService()
+    private let locationManager = CLLocationManager()
 
     private let vStackSpacing: CGFloat = 10.0
 
@@ -42,7 +44,7 @@ struct ListView: View {
                             title: Strings.CBOpenForMaintenanceTitle, desc: Strings.CBOpenForMaintenanceDesc, textHint: Strings.CBOpenForMaintenanceTextHint, runnable: openForMaintenance
                         )
                         InputItemView(
-                            title: Strings.CBLockerReadTitle, desc: Strings.CBLockerReadDesc, textHint: Strings.CBLockerReadHint, runnable: read
+                            title: Strings.CBLockerReadTitle, desc: Strings.CBLockerReadDesc, textHint: Strings.CBLockerReadHint, runnable: checkDoorStatusAvailable
                         )
                     }
                     .padding()
@@ -51,6 +53,9 @@ struct ListView: View {
             .tabItem {
                 Image(systemName: Strings.TabCBLockerIcon)
                 Text(Strings.TabCBLockerName)
+            }
+            .onAppear {
+                checkLocationPermission()
             }
 
             Group {
@@ -104,6 +109,20 @@ struct ListView: View {
             }
         }
         .alert(item: $showingAlert) { item in item.alert }
+    }
+    
+    private func checkLocationPermission(){
+        let status = CLLocationManager().authorizationStatus
+        switch status {
+        case .notDetermined:
+            locationManager.requestWhenInUseAuthorization()
+        case .denied, .restricted:
+            showingAlert = AlertItem.NoLocationPermits()
+        case .authorizedWhenInUse, .authorizedAlways:
+            break
+        @unknown default:
+            break
+        }
     }
 
     private func failure(error: SPRError) {
@@ -180,14 +199,15 @@ struct ListView: View {
         )
     }
     
-    private func read(spacerId: String) {
+    private func checkDoorStatusAvailable(spacerId: String) {
         AppControl.shared.showLoading()
-                
-        cbLockerService.read(
+        
+        cbLockerService.checkDoorStatusAvailable(
+            token: token,
             spacerId: spacerId,
-            success: { readData in
+            success: { lockerAvailable in
                 AppControl.shared.hideLoading()
-                showingAlert = AlertItem.CBLockerReadSuccess(readData)
+                showingAlert = AlertItem.CBLockerReadSuccess(lockerAvailable)
             },
             failure: failure
         )
@@ -267,7 +287,7 @@ struct ListView: View {
 
         AppControl.shared.showLoading()
 
-        sprLockerService.get(
+        sprLockerService.getLockers(
             token: token,
             spacerIds: spacerIds,
             success: { sprLockers in
