@@ -96,7 +96,7 @@ class CBLockerCentralConnectService: NSObject {
         scan()
     }
 
-    private func setLockerHttpSupportStatus(locker: CBLockerModel, success: @escaping (CBLockerModel) -> Void, failure: @escaping (SPRError) -> Void) {
+    private func updateHttpSupportStatus(locker: CBLockerModel, success: @escaping (CBLockerModel) -> Void, failure: @escaping (SPRError) -> Void) {
         sprLockerService.getLocker(
             token: token,
             spacerId: spacerId,
@@ -165,8 +165,7 @@ class CBLockerCentralConnectService: NSObject {
                 CBLockerPeripheralReadService(
                     locker: locker,
                     success: { readData in
-                        let lockerAvailable = !self.notAvailableReadData.contains(readData)
-                        self.readSuccess(lockerAvailable)
+                        self.readSuccess(!self.notAvailableReadData.contains(readData))
                         self.disconnect(locker: locker)
                     },
                     failure: { _ in
@@ -235,7 +234,7 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
             isCanceled = true
             var locker = locker
             locker.isScanned = true
-            setLockerHttpSupportStatus(locker: locker, success: connectable, failure: failure)
+            updateHttpSupportStatus(locker: locker, success: connectable, failure: failure)
         }
     }
 
@@ -245,7 +244,7 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
         if !isCanceled {
             isCanceled = true
             let locker = CBLockerModel(id: spacerId)
-            setLockerHttpSupportStatus(locker: locker,
+            updateHttpSupportStatus(locker: locker,
                                        success: { locker in if locker.isHttpSupported, self.isPermitted {
                                            self.connectable(locker)
                                        } else {
