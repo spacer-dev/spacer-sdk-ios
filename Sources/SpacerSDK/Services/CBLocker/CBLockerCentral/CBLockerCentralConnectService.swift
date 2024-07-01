@@ -244,14 +244,17 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
         if !isCanceled {
             isCanceled = true
             let locker = CBLockerModel(id: spacerId)
-            updateHttpSupportStatus(locker: locker,
-                                       success: { locker in if locker.isHttpSupported, self.isPermitted {
-                                           self.connectable(locker)
-                                       } else {
-                                           self.failure(error)
-                                       }
-                                       },
-                                       failure: failure)
+            updateHttpSupportStatus(
+                locker: locker,
+                success: { locker in
+                    if locker.isHttpSupported, self.isPermitted {
+                        self.connectable(locker)
+                    } else {
+                        self.failure(error)
+                    }
+                },
+                failure: failure
+            )
         }
     }
 }
