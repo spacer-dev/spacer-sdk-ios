@@ -23,7 +23,6 @@ class CBLockerCentralConnectService: NSObject {
     private let httpLockerService = HttpLockerService()
     private var centralService: CBLockerCentralService?
     private var locationManager = CLLocationManager()
-    private var isHttpSupported = false
     private var isCanceled = false
     private var isExecutingHttpService = false
     private var hasBLERetried = false
@@ -122,7 +121,7 @@ class CBLockerCentralConnectService: NSObject {
                         self.disconnect(locker: locker)
                     },
                     failure: { error in
-                        if self.isHttpSupported, !self.hasBLERetried, self.httpFallbackErrors.contains(error), self.isPermitted {
+                        if locker.isHttpSupported, !self.hasBLERetried, self.httpFallbackErrors.contains(error), self.isPermitted {
                             self.locationManager.requestLocation()
                         } else {
                             self.retryOrFailure(
