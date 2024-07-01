@@ -71,6 +71,7 @@ class CBLockerCentralService: NSObject {
     }
 
     func connect(peripheral: CBPeripheral) {
+        print("コネクト開始")
         centralManager?.connect(peripheral, options: nil)
     }
 
@@ -87,10 +88,13 @@ class CBLockerCentralService: NSObject {
 
 extension CBLockerCentralService: CBCentralManagerDelegate {
     public func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        print("１、centralManager初期化")
         let readyScan = central.state == .poweredOn && centralManager?.isScanning == false
         if readyScan {
+            print("２、scan開始")
             centralManager?.scanForPeripherals(withServices: [CBLockerConst.ServiceUUID], options: nil)
         } else {
+            print("スキャンできる状態ではない")
             if let error = central.state.toSPRError() {
                 delegate.failureIfNotCanceled(error)
             }
@@ -98,17 +102,22 @@ extension CBLockerCentralService: CBCentralManagerDelegate {
     }
 
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi RSSI: NSNumber) {
+        print("３、周辺機器を検出しました")
         let id = advertisementData[CBLockerConst.AdvertisementName] as? String ?? ""
+        print("３、検出されたid:\(id)")
         let locker = CBLockerModel(id: id, peripheral: peripheral)
         collectLocker(locker: locker)
     }
 
     public func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        print("コネクト失敗")
         delegate.failureIfNotCanceled(SPRError.CBConnectingFailed)
     }
 
     public func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        print("コネクト成功")
         peripheral.discoverServices([CBLockerConst.ServiceUUID])
+        print("サービス検出開始")
     }
 }
 

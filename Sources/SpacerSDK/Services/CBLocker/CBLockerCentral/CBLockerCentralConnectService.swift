@@ -101,6 +101,7 @@ class CBLockerCentralConnectService: NSObject {
             token: token,
             spacerId: spacerId,
             success: { spacer in
+                print("６、readAPI成功")
                 var locker = locker
                 locker.isHttpSupported = spacer.isHttpSupported
                 success(locker)
@@ -219,6 +220,8 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     func execAfterDiscovered(locker: CBLockerModel) {
         if locker.id == spacerId {
             centralService?.stopScan()
+            print("４、スキャンストップ")
+            print("５、スキャンしたIDと施錠/開錠するロッカ-のIDが一緒なので、successIfNotCanceledへ")
             successIfNotCanceled(locker: locker)
         }
     }
@@ -234,7 +237,14 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
             isCanceled = true
             var locker = locker
             locker.isScanned = true
-            updateHttpSupportStatus(locker: locker, success: connectable, failure: failure)
+            updateHttpSupportStatus(
+                locker: locker,
+                success: { locker in
+                    self.connectable(locker)
+                    print("connectable開始")
+                },
+                failure: failure
+            )
         }
     }
 
@@ -249,6 +259,7 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
                 success: { locker in
                     if locker.isHttpSupported, self.isPermitted {
                         self.connectable(locker)
+                        print("connectable開始")
                     } else {
                         self.failure(error)
                     }
