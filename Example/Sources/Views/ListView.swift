@@ -145,6 +145,7 @@ struct ListView: View {
 
     private func put(spacerId: String) {
         AppControl.shared.showLoading()
+        let start = Date()
 
         cbLockerService.put(
             token: token,
@@ -152,6 +153,8 @@ struct ListView: View {
             success: {
                 AppControl.shared.hideLoading()
                 showingAlert = AlertItem.CBLockerPutSuccess(spacerId)
+                let elapsed = Date().timeIntervalSince(start)
+                print("put処理時間",elapsed)
             },
             failure: failure
         )
@@ -159,6 +162,7 @@ struct ListView: View {
 
     private func take(spacerId: String) {
         AppControl.shared.showLoading()
+        let start = Date()
 
         cbLockerService.take(
             token: token,
@@ -166,6 +170,8 @@ struct ListView: View {
             success: {
                 AppControl.shared.hideLoading()
                 showingAlert = AlertItem.CBLockerTakeSuccess(spacerId)
+                let elapsed = Date().timeIntervalSince(start)
+                print("take処理時間",elapsed)
             },
             failure: failure
         )
