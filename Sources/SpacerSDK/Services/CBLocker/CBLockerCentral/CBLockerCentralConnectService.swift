@@ -184,13 +184,18 @@ class CBLockerCentralConnectService: NSObject {
     }
 
     func httpLockerServices(lat: Double?, lng: Double?) {
+        let start = Date()
         if type == .put {
             httpLockerService.put(
                 token: token,
                 spacerId: spacerId,
                 lat: lat,
                 lng: lng,
-                success: success,
+                success: {
+                    self.success()
+                    let elapsed = Date().timeIntervalSince(start)
+                    print("HTTPのput処理時間",elapsed)
+                },
                 failure: { error in self.failure(error) }
             )
         } else if type == .take {
@@ -199,7 +204,11 @@ class CBLockerCentralConnectService: NSObject {
                 spacerId: spacerId,
                 lat: lat,
                 lng: lng,
-                success: success,
+                success: {
+                    self.success()
+                    let elapsed = Date().timeIntervalSince(start)
+                    print("HTTPのtake処理時間",elapsed)
+                },
                 failure: { error in self.failure(error) }
             )
         } else if type == .openForMaintenance {
