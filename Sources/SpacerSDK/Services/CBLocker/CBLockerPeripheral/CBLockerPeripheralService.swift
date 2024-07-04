@@ -90,7 +90,8 @@ class CBLockerPeripheralService: NSObject {
 
     private func startReadingValueFromCharacteristic(peripheral: CBPeripheral, characteristic: CBCharacteristic) {
         timeouts.readBeforeWrite.set()
-        peripheral.readValue(for: characteristic)
+        print("意図的にreadのタイムアウト")
+//        peripheral.readValue(for: characteristic)
     }
 
     private func finishReadingValueFromCharacteristic() {
