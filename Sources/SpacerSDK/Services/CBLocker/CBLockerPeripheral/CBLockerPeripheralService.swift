@@ -92,6 +92,9 @@ class CBLockerPeripheralService: NSObject {
         timeouts.readBeforeWrite.set()
         print("意図的にreadのタイムアウト")
 //        peripheral.readValue(for: characteristic)
+        let now = Date()
+        let currentMillisecond = Calendar.current.component(.nanosecond, from: now) / 1_000_000
+        print("read開始（予定）のミリ秒: \(currentMillisecond)")
     }
 
     private func finishReadingValueFromCharacteristic() {

@@ -35,6 +35,10 @@ class CBLockerCentralConnectService: NSObject {
         SPRError.CBConnectDiscoverTimeout,
         SPRError.CBConnectReadTimeoutBeforeWrite
     ]
+    
+    // MEMO:テスト用コード
+    private var connectWithRetryStart : Date? = nil
+    private var locationInfoGetStart : Date? = nil
 
     private var notAvailableReadData = ["openedExpired", "openedNotExpired", "closedExpired", "false"]
 
@@ -123,6 +127,10 @@ class CBLockerCentralConnectService: NSObject {
                     },
                     failure: { error in
                         if locker.isHttpSupported, !self.hasBLERetried, self.httpFallbackErrors.contains(error), self.isPermitted {
+                            let now = Date()
+                            let currentMillisecond = Calendar.current.component(.nanosecond, from: now) / 1_000_000
+                            print("拠点取得開始時のミリ秒: \(currentMillisecond)")
+                            self.connectWithRetryStart = Date()
                             self.locationManager.requestLocation()
                         } else {
                             self.retryOrFailure(
@@ -195,6 +203,9 @@ class CBLockerCentralConnectService: NSObject {
                     self.success()
                     let elapsed = Date().timeIntervalSince(start)
                     print("HTTPのput処理時間",elapsed)
+                    let now = Date()
+                    let currentMillisecond = Calendar.current.component(.nanosecond, from: now) / 1_000_000
+                    print("HTTPのput完了時のミリ秒: \(currentMillisecond)")
                 },
                 failure: { error in self.failure(error) }
             )
@@ -208,6 +219,9 @@ class CBLockerCentralConnectService: NSObject {
                     self.success()
                     let elapsed = Date().timeIntervalSince(start)
                     print("HTTPのtake処理時間",elapsed)
+                    let now = Date()
+                    let currentMillisecond = Calendar.current.component(.nanosecond, from: now) / 1_000_000
+                    print("HTTPのtake完了時のミリ秒: \(currentMillisecond)")
                 },
                 failure: { error in self.failure(error) }
             )
@@ -286,6 +300,10 @@ extension CBLockerCentralConnectService: CLLocationManagerDelegate {
             if !isExecutingHttpService {
                 isExecutingHttpService = true
                 httpLockerServices(lat: lat, lng: lng)
+                if let locationInfoGetStart = locationInfoGetStart{
+                    let elapsed = Date().timeIntervalSince(locationInfoGetStart)
+                    print("位置情報取得処理時間",elapsed)
+                }
             }
         }
     }
