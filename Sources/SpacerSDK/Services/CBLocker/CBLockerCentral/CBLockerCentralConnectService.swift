@@ -39,6 +39,7 @@ class CBLockerCentralConnectService: NSObject {
     // MEMO:テスト用コード
     private var connectWithRetryStart : Date? = nil
     private var locationInfoGetStart : Date? = nil
+    private var coneectableStartTime : Date? = nil
 
     private var notAvailableReadData = ["openedExpired", "openedNotExpired", "closedExpired", "false"]
 
@@ -203,6 +204,10 @@ class CBLockerCentralConnectService: NSObject {
                     self.success()
                     let elapsed = Date().timeIntervalSince(start)
                     print("HTTPのput処理時間",elapsed)
+                    if let coneectableStartTime = self.coneectableStartTime {
+                        let elapsed = Date().timeIntervalSince(coneectableStartTime)
+                        print("connectable開始からHTTPのput処理開始まで", elapsed)
+                    }
                     let now = Date()
                     let currentMillisecond = Calendar.current.component(.nanosecond, from: now) / 1_000_000
                     print("HTTPのput完了時のミリ秒: \(currentMillisecond)")
@@ -217,8 +222,12 @@ class CBLockerCentralConnectService: NSObject {
                 lng: lng,
                 success: {
                     self.success()
+                    if let coneectableStartTime = self.coneectableStartTime {
+                        let elapsed = Date().timeIntervalSince(coneectableStartTime)
+                        print("connectable開始からHTTPのtake処理開始まで", elapsed)
+                    }
                     let elapsed = Date().timeIntervalSince(start)
-                    print("HTTPのtake処理時間",elapsed)
+                    print("HTTPのtake処理時間", elapsed)
                     let now = Date()
                     let currentMillisecond = Calendar.current.component(.nanosecond, from: now) / 1_000_000
                     print("HTTPのtake完了時のミリ秒: \(currentMillisecond)")
@@ -264,6 +273,7 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
                 success: { locker in
                     self.connectable(locker)
                     print("connectable開始")
+                    self.coneectableStartTime = Date()
                 },
                 failure: failure
             )
@@ -282,6 +292,7 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
                     if locker.isHttpSupported, self.isPermitted {
                         self.connectable(locker)
                         print("connectable開始")
+                        self.coneectableStartTime = Date()
                     } else {
                         self.failure(error)
                     }
