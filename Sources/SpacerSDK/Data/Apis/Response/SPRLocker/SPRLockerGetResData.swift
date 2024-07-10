@@ -8,7 +8,7 @@
 import Foundation
 
 struct SPRLockerGetResData: IResData {
-    var spacers: [SPRLockerResData]?
+    var spacer: SPRLockerResData?
     var result: Bool
     var error: ErrorResData?
 }

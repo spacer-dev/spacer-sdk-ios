@@ -75,9 +75,15 @@ public class CBLockerService: NSObject
             failure: failure)
     }
     
-    public func read(
-        spacerId: String, success: @escaping (String) -> Void, failure: @escaping (SPRError) -> Void)
+    /// Check if lockers are available
+    /// - Parameters:
+    ///   - token: User token created on the server
+    ///   - spacerId: Locker ID. ex) SPACER055
+    ///   - success: Callback on success
+    ///   - failure: Callback on failure
+    public func checkDoorStatusAvailable(
+        token: String, spacerId: String, success: @escaping (Bool) -> Void, failure: @escaping (SPRError) -> Void)
     {
-        CBLockerCentralConnectService().read(spacerId: spacerId, success: success, failure: failure)
+        CBLockerCentralConnectService().checkDoorStatusAvailable(token: token, spacerId: spacerId, success: success, failure: failure)
     }
 }

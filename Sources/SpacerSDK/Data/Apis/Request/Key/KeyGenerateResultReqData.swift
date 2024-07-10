@@ -9,12 +9,10 @@ import Foundation
 
 struct KeyGenerateResultReqData: IReqData {
     var spacerId: String
-    var readData: String
 
     func toParams() -> [String: Any] {
         [
-            "spacerId": spacerId,
-            "readData": readData
+            "spacerId": spacerId
         ]
     }
 }

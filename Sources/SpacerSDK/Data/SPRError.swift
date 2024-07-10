@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct SPRError {
+public struct SPRError: Equatable {
     public var code: String
     public var message: String
 
@@ -41,7 +41,6 @@ public struct SPRError {
     static let CBConnectStartTimeout = SPRError(code: "E21011201", message: "timeout occurred while connecting to peripheral")
     static let CBConnectDiscoverTimeout = SPRError(code: "E21011202", message: "timeout occurred while discovering characteristic")
     static let CBConnectReadTimeoutBeforeWrite = SPRError(code: "E21011203", message: "timeout occurred while reading the value of the characteristic before write")
-    static let CBConnectReadTimeoutAfterWrite = SPRError(code: "E21011204", message: "timeout occurred while reading the value of the characteristic after write")
     static let CBConnectWriteTimeout = SPRError(code: "E21011205", message: "timeout occurred while writing value to characteristic")
     static let CBConnectDuringTimeout = SPRError(code: "E21011206", message: "timeout occurred during connection processing")
 }
