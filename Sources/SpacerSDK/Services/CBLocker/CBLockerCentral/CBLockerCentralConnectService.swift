@@ -42,7 +42,7 @@ class CBLockerCentralConnectService: NSObject {
         super.init()
         centralService = CBLockerCentralService(delegate: self)
         locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+//        locationManager.desiredAccuracy = kCLLocationAccuracyBest
         let status = CLLocationManager.authorizationStatus()
         isPermitted = status == .authorizedAlways || status == .authorizedWhenInUse
     }
