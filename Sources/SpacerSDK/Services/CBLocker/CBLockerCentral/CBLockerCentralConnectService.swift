@@ -88,7 +88,7 @@ class CBLockerCentralConnectService: NSObject {
         self.token = token
         self.spacerId = spacerId
         type = .checkDoorStatusAvailable
-        connectable = { locker in self.checkDoorStatusAvailable(locker: locker) }
+        connectable = { locker in self.connectWithRetryByRead(locker: locker) }
         readSuccess = success
         self.failure = failure
 
@@ -159,30 +159,31 @@ class CBLockerCentralConnectService: NSObject {
         guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
         centralService?.disconnect(peripheral: peripheral)
     }
+    
+    private func connectWithRetryByRead(locker: CBLockerModel, retryNum: Int = 0) {
+        guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
+        let peripheralDelegate =
+            CBLockerPeripheralReadService(
+                locker: locker, success: { readData in
+                    let lockerAvailable = !self.notAvailableReadData.contains(readData)
+                    self.readSuccess(lockerAvailable)
+                    self.disconnect(locker: locker)
+                },
+                failure: { error in
+                    self.retryOrFailure(
+                        error: error,
+                        locker: locker,
+                        retryNum: retryNum + 1,
+                        executable: { self.connectWithRetryByRead(locker: locker, retryNum: retryNum + 1) }
+                    )
+                }
+            )
 
-    private func checkDoorStatusAvailable(locker: CBLockerModel) {
-        if locker.isScanned {
-            guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
-            let peripheralDelegate =
-                CBLockerPeripheralReadService(
-                    locker: locker,
-                    success: { readData in
-                        self.readSuccess(!self.notAvailableReadData.contains(readData))
-                        self.disconnect(locker: locker)
-                    },
-                    failure: { _ in
-                        self.readSuccess(locker.isHttpSupported)
-                    }
-                )
+        let delegate = peripheralDelegate
 
-            let delegate = peripheralDelegate
-
-            locker.peripheral?.delegate = delegate
-            delegate.startConnectingAndDiscoveringServices()
-            centralService?.connect(peripheral: peripheral)
-        } else {
-            readSuccess(locker.isHttpSupported)
-        }
+        locker.peripheral?.delegate = delegate
+        delegate.startConnectingAndDiscoveringServices()
+        centralService?.connect(peripheral: peripheral)
     }
 
     func httpLockerServices(lat: Double?, lng: Double?) {
