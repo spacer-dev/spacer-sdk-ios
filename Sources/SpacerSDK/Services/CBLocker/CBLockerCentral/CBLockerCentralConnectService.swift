@@ -95,18 +95,18 @@ class CBLockerCentralConnectService: NSObject {
         scan()
     }
 
-    private func updateHttpSupportStatus(locker: CBLockerModel, success: @escaping (CBLockerModel) -> Void, failure: @escaping (SPRError) -> Void) {
-        sprLockerService.getLocker(
-            token: token,
-            spacerId: spacerId,
-            success: { spacer in
-                var locker = locker
-                locker.isHttpSupported = spacer.isHttpSupported
-                success(locker)
-            },
-            failure: failure
-        )
-    }
+//    private func updateHttpSupportStatus(locker: CBLockerModel, success: @escaping (CBLockerModel) -> Void, failure: @escaping (SPRError) -> Void) {
+//        sprLockerService.getLocker(
+//            token: token,
+//            spacerId: spacerId,
+//            success: { spacer in
+//                var locker = locker
+//                locker.isHttpSupported = spacer.isHttpSupported
+//                success(locker)
+//            },
+//            failure: failure
+//        )
+//    }
 
     private func connectWithRetry(locker: CBLockerModel, retryNum: Int = 0) {
         print("リトライ回数：\(retryNum)")
@@ -235,9 +235,10 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
 
         if !isCanceled {
             isCanceled = true
-            var locker = locker
-            locker.isScanned = true
-            updateHttpSupportStatus(locker: locker, success: connectable, failure: failure)
+//            var locker = locker
+//            locker.isScanned = true
+//            updateHttpSupportStatus(locker: locker, success: connectable, failure: failure)
+            connectable(locker)
         }
     }
 
@@ -247,18 +248,19 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
 
         if !isCanceled {
             isCanceled = true
-            let locker = CBLockerModel(id: spacerId)
-            updateHttpSupportStatus(
-                locker: locker,
-                success: { locker in
-                    if locker.isHttpSupported, self.isPermitted {
-                        self.connectable(locker)
-                    } else {
-                        self.failure(error)
-                    }
-                },
-                failure: failure
-            )
+//            let locker = CBLockerModel(id: spacerId)
+//            updateHttpSupportStatus(
+//                locker: locker,
+//                success: { locker in
+//                    if locker.isHttpSupported, self.isPermitted {
+//                        self.connectable(locker)
+//                    } else {
+//                        self.failure(error)
+//                    }
+//                },
+//                failure: failure
+//            )
+            failure(error)
         }
     }
 }
