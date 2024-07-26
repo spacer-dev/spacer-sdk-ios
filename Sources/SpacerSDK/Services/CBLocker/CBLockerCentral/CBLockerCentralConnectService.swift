@@ -235,8 +235,8 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
 
         if !isCanceled {
             isCanceled = true
-//            var locker = locker
-//            locker.isScanned = true
+            var locker = locker
+            locker.isScanned = true
 //            updateHttpSupportStatus(locker: locker, success: connectable, failure: failure)
             connectable(locker)
         }
