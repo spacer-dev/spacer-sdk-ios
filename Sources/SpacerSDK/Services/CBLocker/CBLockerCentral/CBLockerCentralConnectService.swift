@@ -109,7 +109,9 @@ class CBLockerCentralConnectService: NSObject {
     }
 
     private func connectWithRetry(locker: CBLockerModel, retryNum: Int = 0) {
+        print("リトライ回数：\(retryNum)")
         if locker.isHttpSupported, !locker.isScanned, isPermitted {
+            print("位置情報の取得を開始します BLEコネクトは未実施")
             locationManager.requestLocation()
         } else {
             guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
@@ -122,6 +124,7 @@ class CBLockerCentralConnectService: NSObject {
                     },
                     failure: { error in
                         if locker.isHttpSupported, !self.hasBLERetried, self.httpFallbackErrors.contains(error), self.isPermitted {
+                            print("位置情報の取得を開始します BLEリトライ済み")
                             self.locationManager.requestLocation()
                         } else {
                             self.retryOrFailure(
@@ -227,6 +230,7 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     }
 
     func successIfNotCanceled(locker: CBLockerModel) {
+        print("スキャンに成功しました")
         centralService?.stopScan()
 
         if !isCanceled {
@@ -238,6 +242,7 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
     }
 
     func failureIfNotCanceled(_ error: SPRError) {
+        print("スキャンに失敗しました")
         centralService?.stopScan()
 
         if !isCanceled {

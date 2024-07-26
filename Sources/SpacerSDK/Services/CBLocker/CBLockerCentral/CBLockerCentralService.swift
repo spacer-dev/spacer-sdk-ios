@@ -45,6 +45,7 @@ class CBLockerCentralService: NSObject {
             }
 
             if self.scanningCnt > CBLockerCentralService.MaxScanningCnt {
+                print("9秒間スキャンを行ったため、スキャンを中止します")
                 self.stopScan()
                 delegate.failureIfNotCanceled(SPRError.CBCentralTimeout)
             } else {
@@ -71,14 +72,17 @@ class CBLockerCentralService: NSObject {
     }
 
     func connect(peripheral: CBPeripheral) {
+        print("コネクト開始")
         centralManager?.connect(peripheral, options: nil)
     }
 
     func discoverServices(peripheral: CBPeripheral) {
+        print("サービス検出開始")
         peripheral.discoverServices([CBLockerConst.ServiceUUID])
     }
 
     func disconnect(peripheral: CBPeripheral) {
+        print("disconnect開始")
         DispatchQueue.main.asyncAfter(deadline: .now() + CBLockerConst.DelayDisconnectSeconds) {
             self.centralManager?.cancelPeripheralConnection(peripheral)
         }
@@ -89,25 +93,30 @@ extension CBLockerCentralService: CBCentralManagerDelegate {
     public func centralManagerDidUpdateState(_ central: CBCentralManager) {
         let readyScan = central.state == .poweredOn && centralManager?.isScanning == false
         if readyScan {
+            print("スキャン開始")
             centralManager?.scanForPeripherals(withServices: [CBLockerConst.ServiceUUID], options: nil)
         } else {
             if let error = central.state.toSPRError() {
+                print("スキャンできる状態ではありません")
                 delegate.failureIfNotCanceled(error)
             }
         }
     }
 
     public func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi RSSI: NSNumber) {
+        print("ペリフェラルを検出しました")
         let id = advertisementData[CBLockerConst.AdvertisementName] as? String ?? ""
         let locker = CBLockerModel(id: id, peripheral: peripheral)
         collectLocker(locker: locker)
     }
 
     public func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        print("コネクトに失敗しました")
         delegate.failureIfNotCanceled(SPRError.CBConnectingFailed)
     }
 
     public func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        print("コネクトに成功しました")
         peripheral.discoverServices([CBLockerConst.ServiceUUID])
     }
 }

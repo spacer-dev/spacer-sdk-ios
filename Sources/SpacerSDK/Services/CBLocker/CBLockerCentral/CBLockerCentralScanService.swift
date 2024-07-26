@@ -53,6 +53,7 @@ extension CBLockerCentralScanService: CBLockerCentralDelegate {
     }
 
     func successIfNotCanceled(sprLockers: [SPRLockerModel]) {
+        print("スキャンに成功しました")
         centralService?.stopScan()
 
         var sprLockers = sprLockers
@@ -61,19 +62,23 @@ extension CBLockerCentralScanService: CBLockerCentralDelegate {
                 sprLockers.enumerated().forEach { index, sprLocker in
                     if sprLocker.id == scannedlocker.id {
                         sprLockers[index].isScanned = true
+                        print("\(scannedlocker.id)のisScannedをtrueにしました")
                     }
                 }
             }
             isCanceled = true
+            print("スキャンに成功したロッカー一覧\(sprLockers)")
             success(sprLockers)
         }
     }
 
     func failureIfNotCanceled(_ error: SPRError) {
+        print("スキャンに失敗しました")
         centralService?.stopScan()
 
         if !isCanceled {
             isCanceled = true
+            print("error:\(error)")
             failure(error)
         }
     }
