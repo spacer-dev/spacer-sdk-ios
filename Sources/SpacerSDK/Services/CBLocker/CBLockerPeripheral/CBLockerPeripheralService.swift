@@ -89,12 +89,21 @@ class CBLockerPeripheralService: NSObject {
     }
 
     private func startReadingValueFromCharacteristic(peripheral: CBPeripheral, characteristic: CBCharacteristic) {
-        timeouts.readBeforeWrite.set()
+        if locker.status == .none {
+            timeouts.readBeforeWrite.set()
+        } else if locker.status == .write {
+            timeouts.readAfterWrite.set()
+        }
+        
         peripheral.readValue(for: characteristic)
     }
 
     private func finishReadingValueFromCharacteristic() {
-        timeouts.readBeforeWrite.clear()
+        if locker.status == .none {
+            timeouts.readBeforeWrite.clear()
+        } else if locker.status == .write {
+            timeouts.readAfterWrite.clear()
+        }
     }
 
     private func startGettingKey(peripheral: CBPeripheral, characteristic: CBCharacteristic) {
@@ -191,7 +200,7 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
         print("peripheral didUpdateValueFor")
 
         finishReadingValueFromCharacteristic()
-        
+
         guard error == nil else {
             print("peripheral didUpdateValueFor failed with error: \(String(describing: error))")
             return failureIfNotCanceled(SPRError.CBReadingCharacteristicFailed)
@@ -208,7 +217,11 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
         if isRetry, alreadyWrittenToCharacteristic(locker: locker) {
             startSavingKey()
         } else {
-            startGettingKey(peripheral: peripheral, characteristic: characteristic)
+            if locker.status == .none {
+                startGettingKey(peripheral: peripheral, characteristic: characteristic)
+            } else if locker.status == .write {
+                startSavingKey()
+            }
         }
     }
 
@@ -223,6 +236,6 @@ extension CBLockerPeripheralService: CBPeripheralDelegate {
         }
 
         locker.updateStatus(.write)
-        startSavingKey()
+        startReadingValueFromCharacteristic(peripheral: peripheral, characteristic: characteristic)
     }
 }

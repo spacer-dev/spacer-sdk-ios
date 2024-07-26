@@ -36,6 +36,7 @@ class CBLockerConnectTimeouts {
     let start: CBLockerTimeout!
     let discover: CBLockerTimeout!
     let readBeforeWrite: CBLockerTimeout!
+    let readAfterWrite: CBLockerTimeout!
     let write: CBLockerTimeout!
     let during: CBLockerTimeout!
 
@@ -43,11 +44,12 @@ class CBLockerConnectTimeouts {
         start = CBLockerTimeout(name: "start connecting", seconds: CBLockerConst.StartTimeoutSeconds, error: SPRError.CBConnectStartTimeout, executable: executable)
         discover = CBLockerTimeout(name: "discover characteristic", seconds: CBLockerConst.DiscoverTimeoutSeconds, error: SPRError.CBConnectDiscoverTimeout, executable: executable)
         readBeforeWrite = CBLockerTimeout(name: "read characteristic before write", seconds: CBLockerConst.ReadTimeoutSeconds, error: SPRError.CBConnectReadTimeoutBeforeWrite, executable: executable)
+        readAfterWrite = CBLockerTimeout(name: "read characteristic after write", seconds: CBLockerConst.ReadTimeoutSeconds, error: SPRError.CBConnectReadTimeoutAfterWrite, executable: executable)
         write = CBLockerTimeout(name: "write to characteristic", seconds: CBLockerConst.WriteTimeoutSeconds, error: SPRError.CBConnectWriteTimeout, executable: executable)
         during = CBLockerTimeout(name: "during connection processing", seconds: CBLockerConst.DuringTimeoutSeconds, error: SPRError.CBConnectDuringTimeout, executable: executable)
     }
 
     func clearAll() {
-        [start, discover, readBeforeWrite, write, during].forEach { timeout in timeout?.clear() }
+        [start, discover, readBeforeWrite, readAfterWrite, write, during].forEach { timeout in timeout?.clear() }
     }
 }

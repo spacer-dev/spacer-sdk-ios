@@ -9,10 +9,12 @@ import Foundation
 
 struct MaintenanceKeyGetResultReqData: IReqData {
     var spacerId: String
+    var readData: String
 
     func toParams() -> [String: Any] {
         [
-            "spacerId": spacerId
+            "spacerId": spacerId,
+            "readData": readData
         ]
     }
 }
