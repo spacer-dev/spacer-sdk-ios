@@ -7,6 +7,8 @@
 
 import SpacerSDK
 import SwiftUI
+// <追加>
+//import CoreLocation
 
 struct ListView: View {
     private let token = ProcessInfo.processInfo.environment["SDK_TOKEN"] ?? ""
@@ -15,6 +17,8 @@ struct ListView: View {
     private let sprLockerService = SPR.sprLockerService()
     private let myLockerService = SPR.myLockerService()
     private let locationService = SPR.locationService()
+//  <追加>
+//  private let locationManager = CLLocationManager()
 
     private let vStackSpacing: CGFloat = 10.0
 
@@ -42,7 +46,10 @@ struct ListView: View {
                             title: Strings.CBOpenForMaintenanceTitle, desc: Strings.CBOpenForMaintenanceDesc, textHint: Strings.CBOpenForMaintenanceTextHint, runnable: openForMaintenance
                         )
                         InputItemView(
+//                          [変更前]
                             title: Strings.CBLockerReadTitle, desc: Strings.CBLockerReadDesc, textHint: Strings.CBLockerReadHint, runnable: read
+//                          [変更後]
+//                          title: Strings.CBLockerReadTitle, desc: Strings.CBLockerReadDesc, textHint: Strings.CBLockerReadHint, runnable: checkDoorStatusAvailable
                         )
                     }
                     .padding()
@@ -52,6 +59,10 @@ struct ListView: View {
                 Image(systemName: Strings.TabCBLockerIcon)
                 Text(Strings.TabCBLockerName)
             }
+//            <追加>
+//            .onAppear {
+//                checkLocationPermission()
+//            }
 
             Group {
                 ScrollView(.vertical) {
@@ -105,6 +116,21 @@ struct ListView: View {
         }
         .alert(item: $showingAlert) { item in item.alert }
     }
+    
+//    <追加>
+//    private func checkLocationPermission(){
+//        let status = CLLocationManager().authorizationStatus
+//        switch status {
+//        case .notDetermined:
+//            locationManager.requestWhenInUseAuthorization()
+//        case .denied, .restricted:
+//            showingAlert = AlertItem.NoLocationPermits()
+//        case .authorizedWhenInUse, .authorizedAlways:
+//            break
+//        @unknown default:
+//            break
+//        }
+//    }
 
     private func failure(error: SPRError) {
         AppControl.shared.hideLoading()
@@ -180,14 +206,30 @@ struct ListView: View {
         )
     }
     
+//  [変更前]
     private func read(spacerId: String) {
+//  [変更後]
+//  private func checkDoorStatusAvailable(spacerId: String) {
+        
         AppControl.shared.showLoading()
-                
+        
+//      [変更前]
         cbLockerService.read(
             spacerId: spacerId,
+//      [変更後]
+//      cbLockerService.checkDoorStatusAvailable(
+//            spacerId: spacerId,
+//            token: token,
+            
+//          [変更前]
             success: { readData in
+//          [変更後]
+//          success: { lockerAvailable in
                 AppControl.shared.hideLoading()
+//              [変更前]
                 showingAlert = AlertItem.CBLockerReadSuccess(readData)
+//              [変更後]
+//              showingAlert = AlertItem.CBLockerReadSuccess(lockerAvailable)
             },
             failure: failure
         )
@@ -266,8 +308,10 @@ struct ListView: View {
         let spacerIds = spacerIdsText.components(separatedBy: ",")
 
         AppControl.shared.showLoading()
-
+//      [変更前]
         sprLockerService.get(
+//      [変更後]
+//      sprLockerService.getLockers(
             token: token,
             spacerIds: spacerIds,
             success: { sprLockers in

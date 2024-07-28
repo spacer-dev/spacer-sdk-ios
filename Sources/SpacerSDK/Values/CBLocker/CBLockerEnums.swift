@@ -11,7 +11,10 @@ enum CBLockerActionType {
     case put
     case take
     case openForMaintenance
+//  [変更前]
     case read
+//  [変更後]
+//  case checkDoorStatusAvailable
 }
 
 enum CBLockerStatus {

@@ -7,7 +7,10 @@
 
 import Foundation
 
+//  [変更前]
 public struct SPRError {
+//  [変更後]
+//public struct SPRError: Equatable {
     public var code: String
     public var message: String
 
