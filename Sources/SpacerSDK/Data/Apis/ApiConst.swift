@@ -27,9 +27,9 @@ enum ApiPaths {
 //  [変更前]
     static let lockerSpacerGet = "locker/spacer/get"
 //  [変更後]
-    static let lockerSpacerList = "locker/spacer/list"
+//    static let lockerSpacerList = "locker/spacer/list"
 //  <追加>
-    static let lockerSpacer = "locker/spacer/"
+//    static let lockerSpacer = "locker/spacer/"
     
     static let lockerUnitGet = "locker/unit/get"
     static let LocationGet = "location/get"
