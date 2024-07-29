@@ -8,11 +8,17 @@
 import Foundation
 
 struct SPRLockerGetReqData: IReqData {
+//  [変更前]
     var spacerIds: [String]
+//  [変更後]
+//  var spacerId: String
 
     func toParams() -> [String: Any] {
         [
+//          [変更前]
             "spacerIds": spacerIds
+//          [変更後]
+//          "spacerId": spacerId
         ]
     }
 }
