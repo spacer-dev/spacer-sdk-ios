@@ -49,7 +49,7 @@ class CBLockerCentralConnectService: NSObject {
 
     override init() {
         super.init()
-        centralService = CBLockerCentralService(delegate: self)
+        self.centralService = CBLockerCentralService(delegate: self)
 //      <追加>
 //      locationManager.delegate = self
 //      locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -64,8 +64,8 @@ class CBLockerCentralConnectService: NSObject {
     func put(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         self.token = token
         self.spacerId = spacerId
-        type = .put
-        connectable = { locker in self.connectWithRetry(locker: locker) }
+        self.type = .put
+        self.connectable = { locker in self.connectWithRetry(locker: locker) }
         self.success = success
         self.failure = failure
 
@@ -75,8 +75,8 @@ class CBLockerCentralConnectService: NSObject {
     func take(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         self.token = token
         self.spacerId = spacerId
-        type = .take
-        connectable = { locker in self.connectWithRetry(locker: locker) }
+        self.type = .take
+        self.connectable = { locker in self.connectWithRetry(locker: locker) }
         self.success = success
         self.failure = failure
 
@@ -86,8 +86,8 @@ class CBLockerCentralConnectService: NSObject {
     func openForMaintenance(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         self.token = token
         self.spacerId = spacerId
-        type = .openForMaintenance
-        connectable = { locker in self.connectWithRetry(locker: locker) }
+        self.type = .openForMaintenance
+        self.connectable = { locker in self.connectWithRetry(locker: locker) }
         self.success = success
         self.failure = failure
 
