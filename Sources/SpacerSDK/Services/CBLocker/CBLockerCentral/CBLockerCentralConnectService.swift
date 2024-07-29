@@ -7,11 +7,11 @@
 
 import CoreBluetooth
 // <追加>
-import CoreLocation
+//import CoreLocation
 
 import Foundation
 // <追加>
-import UIKit
+//import UIKit
 
 class CBLockerCentralConnectService: NSObject {
     private var token: String!

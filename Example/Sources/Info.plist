@@ -22,8 +22,8 @@
 	<true/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Used to detect lockers.</string>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>Bluetooth is used to communicate with BLE devices.</string>
+    <key>NSBluetoothPeripheralUsageDescription</key>
+    <string>Bluetooth is used to communicate with BLE devices.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Used to detect lockers.</string>
 	<key>UIApplicationSceneManifest</key>
