@@ -42,8 +42,12 @@ struct AlertItem: Identifiable {
         AlertItem(title: "succeeded in taking with \(urlKey)")
     }
     
+//  [追加前]
     static func CBLockerReadSuccess(_ readData: String) -> AlertItem {
         AlertItem(title: "succeeded in reading", message: "\(readData)")
+//  <追加>
+//  static func CBLockerReadSuccess(_ lockerAvailable: Bool) -> AlertItem {
+//      AlertItem(title: "succeeded in reading", message: "\(lockerAvailable)")
     }
 
     static func MyLockerGetSuccess(_ myLockers: [MyLockerModel]) -> AlertItem {
@@ -81,4 +85,9 @@ struct AlertItem: Identifiable {
     static func SPRLocationGetSuccess(_ sprLocation: LocationModel) -> AlertItem {
         AlertItem(title: "succeeded in getting location", message: sprLocation.description)
     }
+
+//    <追加>
+//    static func NoLocationPermits() -> AlertItem {
+//        AlertItem(title: "Permission to use location information is required", message: "Please allow the use of location information in the Settings app.")
+//    }
 }

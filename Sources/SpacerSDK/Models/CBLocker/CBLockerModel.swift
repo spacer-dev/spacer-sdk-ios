@@ -10,6 +10,9 @@ import Foundation
 
 public struct CBLockerModel: Identifiable {
     public var id: String
+//  <追加>
+//  public var isScanned = false
+//  public var isHttpSupported = false
     private(set) var status: CBLockerStatus = .none
     private(set) var readData: String = ""
     private(set) var peripheral: CBPeripheral?
