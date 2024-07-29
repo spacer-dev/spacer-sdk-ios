@@ -15,4 +15,5 @@ struct SPRLockerResData: Codable {
     public var version: String
     public var doorStatus: String
     public var doorStatusExpiredAt: String?
+    public var isHttpSupported: Bool
 }

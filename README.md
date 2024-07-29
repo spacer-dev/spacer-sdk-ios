@@ -60,6 +60,19 @@ Please change the wording of value to your company's appropriate wording　　
     <string>Bluetooth is used to communicate with BLE devices.</string>
 ```
 
+### Location permission settings
+
+「info.plist」→「Open As」 →「source code」　　
+
+Add the following Key and Value           
+Please change the wording of value to your company's appropriate wording　
+
+```
+<dict>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Used to detect lockers.</string>
+```
+
 ### 1. CB Locker Service
 
 ```swift
