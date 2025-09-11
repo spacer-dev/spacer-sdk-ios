@@ -10,6 +10,7 @@ import Foundation
 enum CBLockerActionType {
     case put
     case take
+    case reservedOpen
     case openForMaintenance
     case checkDoorStatusAvailable
 }

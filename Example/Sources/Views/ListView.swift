@@ -5,9 +5,9 @@
 //  Created by Takehito Soi on 2021/06/21.
 //
 
+import CoreLocation
 import SpacerSDK
 import SwiftUI
-import CoreLocation
 
 struct ListView: View {
     private let token = ProcessInfo.processInfo.environment["SDK_TOKEN"] ?? ""
@@ -36,6 +36,9 @@ struct ListView: View {
                         )
                         InputItemView(
                             title: Strings.CBLockerTakeTitle, desc: Strings.CBLockerTakeDesc, textHint: Strings.CBLockerTakeTextHint, runnable: take
+                        )
+                        InputItemView(
+                            title: Strings.CBLockerReservedOpenTitle, desc: Strings.CBLockerReservedOpenDesc, textHint: Strings.CBLockerReservedOpenTextHint, runnable: reservedOpen
                         )
                         InputItemView(
                             title: Strings.CBLockerTakeWithKeyTitle, desc: Strings.CBLockerTakeWithKeyDesc, textHint: Strings.CBLockerTakeWithKeyTextHint, runnable: takeWithKey
@@ -110,8 +113,8 @@ struct ListView: View {
         }
         .alert(item: $showingAlert) { item in item.alert }
     }
-    
-    private func checkLocationPermission(){
+
+    private func checkLocationPermission() {
         let status = CLLocationManager().authorizationStatus
         switch status {
         case .notDetermined:
@@ -170,7 +173,21 @@ struct ListView: View {
             failure: failure
         )
     }
-    
+
+    private func reservedOpen(spacerId: String) {
+        AppControl.shared.showLoading()
+
+        cbLockerService.reservedOpen(
+            token: token,
+            spacerId: spacerId,
+            success: {
+                AppControl.shared.hideLoading()
+                showingAlert = AlertItem.CBLockerTakeSuccess(spacerId)
+            },
+            failure: failure
+        )
+    }
+
     private func openForMaintenance(spacerId: String) {
         AppControl.shared.showLoading()
 
@@ -198,10 +215,10 @@ struct ListView: View {
             failure: failure
         )
     }
-    
+
     private func checkDoorStatusAvailable(spacerId: String) {
         AppControl.shared.showLoading()
-        
+
         cbLockerService.checkDoorStatusAvailable(
             token: token,
             spacerId: spacerId,
@@ -225,10 +242,10 @@ struct ListView: View {
             failure: failure
         )
     }
-    
+
     private func getMyMaintenanceLocker() {
         AppControl.shared.showLoading()
-        
+
         myLockerService.getMyMaintenanceLocker(
             token: token,
             success: { myMaintenanceLockers in
@@ -237,7 +254,6 @@ struct ListView: View {
             },
             failure: failure
         )
-
     }
 
     private func reserve(spacerId: String) {
@@ -313,10 +329,10 @@ struct ListView: View {
             failure: failure
         )
     }
-    
+
     private func getSPRLocation(locationId: String) {
         AppControl.shared.showLoading()
-        
+
         locationService.get(
             token: token,
             locationId: locationId,
