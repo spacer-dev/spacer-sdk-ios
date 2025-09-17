@@ -28,23 +28,28 @@ class Strings {
     static let CBLockerScanDesc = "use bluetooth to detect locker in front of you."
 
     static let CBLockerPutTitle = "put in locker"
-    static let CBLockerPutDesc = "connect to locker with bluetooth and put your luggage in locker."
+    static let CBLockerPutDesc = "connect to locker with bluetooth/http and put your luggage in locker."
     static let CBLockerPutTextHint = "spacer id"
 
     static let CBLockerTakeTitle = "take from locker"
-    static let CBLockerTakeDesc = "connect to locker with bluetooth and take luggage from locker."
+    static let CBLockerTakeDesc = "connect to locker with bluetooth/http and take luggage from locker."
     static let CBLockerTakeTextHint = "spacer id"
     static let CBLockerTakeSuccessTitle = "succeeded in taking"
-    
+
+    static let CBLockerReservedOpenTitle = "reserved open from locker"
+    static let CBLockerReservedOpenDesc = "connect to locker with http and reserved open luggage from locker."
+    static let CBLockerReservedOpenTextHint = "spacer id"
+    static let CBLockerReservedOpenSuccessTitle = "succeeded in reserved opening"
+
     static let CBOpenForMaintenanceTitle = "open for maintenance from locker"
-    static let CBOpenForMaintenanceDesc = "connect to locker with bluetooth and open for maintenance from locker."
+    static let CBOpenForMaintenanceDesc = "connect to locker with bluetooth/http and open for maintenance from locker."
     static let CBOpenForMaintenanceTextHint = "spacer id"
     static let CBOpenForMaintenanceSuccessTitle = "succeeded in opening"
 
     static let CBLockerTakeWithKeyTitle = "take from locker with url key"
     static let CBLockerTakeWithKeyDesc = "connect to locker with bluetooth and take luggage from locker with url key."
     static let CBLockerTakeWithKeyTextHint = "url key"
-    
+
     static let CBLockerReadTitle = "read from locker"
     static let CBLockerReadDesc = "connect to locker with bluetooth and read characteristic."
     static let CBLockerReadHint = "spacer id"
@@ -52,7 +57,7 @@ class Strings {
 
     static let MyLockerGetTitle = "get my lockers"
     static let MyLockerGetDesc = "get a list of your lockers in use."
-    
+
     static let MyMaintenanceLockerGetTitle = "get my maintenance lockers"
     static let MyMaintenanceLockerGetDesc = "get a list of your maintenance lockers in use."
 
@@ -75,7 +80,7 @@ class Strings {
     static let SPRUnitGetTitle = "get locker units"
     static let SPRUnitGetDesc = "get multiple locker unit basic information."
     static let SPRUnitGetTextHint = "unit ids separated by commas"
-    
+
     static let SPRLocationGetTitle = "get location"
     static let SPRLocationGetDesc = "get multiple unit location basic information."
     static let SPRLocationGetTextHint = "location id"
