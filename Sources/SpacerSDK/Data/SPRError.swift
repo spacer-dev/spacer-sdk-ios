@@ -35,6 +35,7 @@ public struct SPRError: Equatable {
     static let CBCharacteristicNotFound = SPRError(code: "E21011002", message: "peripheral characteristic is not found")
     static let CBReadingCharacteristicFailed = SPRError(code: "E21011003", message: "peripheral reading characteristic failed")
     static let CBWritingCharacteristicFailed = SPRError(code: "E21011004", message: "peripheral writing characteristic failed")
+    static let CBServiceNotSupported = SPRError(code: "E21011005", message: "peripheral service is not supported")
 
     static let CBPeripheralNotFound = SPRError(code: "E21011101", message: "peripheral is not found")
 
