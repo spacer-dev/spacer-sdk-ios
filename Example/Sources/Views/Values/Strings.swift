@@ -28,11 +28,11 @@ class Strings {
     static let CBLockerScanDesc = "use bluetooth to detect locker in front of you."
 
     static let CBLockerPutTitle = "put in locker"
-    static let CBLockerPutDesc = "connect to locker with bluetooth/http and put your luggage in locker."
+    static let CBLockerPutDesc = "connect to locker with http/bluetooth and put your luggage in locker."
     static let CBLockerPutTextHint = "spacer id"
 
     static let CBLockerTakeTitle = "take from locker"
-    static let CBLockerTakeDesc = "connect to locker with bluetooth/http and take luggage from locker."
+    static let CBLockerTakeDesc = "connect to locker with http/bluetooth and take luggage from locker."
     static let CBLockerTakeTextHint = "spacer id"
     static let CBLockerTakeSuccessTitle = "succeeded in taking"
 
@@ -42,7 +42,7 @@ class Strings {
     static let CBLockerReservedOpenSuccessTitle = "succeeded in reserved opening"
 
     static let CBOpenForMaintenanceTitle = "open for maintenance from locker"
-    static let CBOpenForMaintenanceDesc = "connect to locker with bluetooth/http and open for maintenance from locker."
+    static let CBOpenForMaintenanceDesc = "connect to locker with http/bluetooth and open for maintenance from locker."
     static let CBOpenForMaintenanceTextHint = "spacer id"
     static let CBOpenForMaintenanceSuccessTitle = "succeeded in opening"
 
