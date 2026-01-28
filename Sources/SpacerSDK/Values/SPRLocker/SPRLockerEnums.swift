@@ -10,6 +10,7 @@ import Foundation
 public enum SPRLockerStatus: String {
     case available
     case reserved
+    case reservedOpen
     case using
     case limited
     case unknown
