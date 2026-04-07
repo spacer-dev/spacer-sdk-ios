@@ -11,7 +11,7 @@ struct HttpLockerReqData: IReqData {
     var spacerId: String
 
     func toParams() -> [String: Any] {
-        var params: [String: Any] = ["spacerId": spacerId]
+        let params: [String: Any] = ["spacerId": spacerId]
         return params
     }
 }
