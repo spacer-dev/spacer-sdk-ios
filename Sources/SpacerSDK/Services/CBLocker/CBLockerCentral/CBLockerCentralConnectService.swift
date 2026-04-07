@@ -18,72 +18,69 @@ class CBLockerCentralConnectService: NSObject {
     private var success: () -> Void = {}
     private var readSuccess: (Bool) -> Void = { _ in }
     private var failure: (SPRError) -> Void = { _ in }
-
+    
     private let sprLockerService = SPR.sprLockerService()
     private let httpLockerService = HttpLockerService()
     private var centralService: CBLockerCentralService?
     private var locationManager = CLLocationManager()
     private var isCanceled = false
     private var isExecutingHttpService = false
-    private var hasBLERetried = false
     private var isPermitted = false
-    private let httpFallbackErrors = [
-        SPRError.CBServiceNotFound,
-        SPRError.CBCharacteristicNotFound,
-        SPRError.CBReadingCharacteristicFailed,
-        SPRError.CBConnectStartTimeout,
-        SPRError.CBConnectDiscoverTimeout,
-        SPRError.CBConnectReadTimeoutBeforeWrite
-    ]
-
+    private var cachedHttpSupported: Bool?
+    
     private var notAvailableReadData = ["openedExpired", "openedNotExpired", "closedExpired", "false"]
-
+    
     override init() {
         super.init()
         centralService = CBLockerCentralService(delegate: self)
-        locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
         let status = CLLocationManager.authorizationStatus()
         isPermitted = status == .authorizedAlways || status == .authorizedWhenInUse
     }
-
+    
     private func scan() {
         centralService?.startScan()
     }
-
+    
     func put(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         self.token = token
         self.spacerId = spacerId
         type = .put
-        connectable = { locker in self.connectWithRetry(locker: locker) }
         self.success = success
         self.failure = failure
-
-        scan()
+        
+        prepareAndScan(isScan: true, success: success, failure: failure)
     }
 
     func take(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         self.token = token
         self.spacerId = spacerId
         type = .take
-        connectable = { locker in self.connectWithRetry(locker: locker) }
         self.success = success
         self.failure = failure
-
-        scan()
+        
+        prepareAndScan(isScan: true, success: success, failure: failure)
+    }
+    
+    func reservedOpen(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+        self.token = token
+        self.spacerId = spacerId
+        type = .reservedOpen
+        self.success = success
+        self.failure = failure
+        
+        prepareAndScan(isScan: false, success: success, failure: failure)
     }
 
     func openForMaintenance(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
         self.token = token
         self.spacerId = spacerId
         type = .openForMaintenance
-        connectable = { locker in self.connectWithRetry(locker: locker) }
         self.success = success
         self.failure = failure
-
-        scan()
+        
+        prepareAndScan(isScan: true, success: success, failure: failure)
     }
-
+    
     func checkDoorStatusAvailable(token: String, spacerId: String, success: @escaping (Bool) -> Void, failure: @escaping (SPRError) -> Void) {
         self.token = token
         self.spacerId = spacerId
@@ -91,72 +88,70 @@ class CBLockerCentralConnectService: NSObject {
         connectable = { locker in self.checkDoorStatusAvailable(locker: locker) }
         readSuccess = success
         self.failure = failure
-
+        
         scan()
     }
-
+    
     private func updateHttpSupportStatus(locker: CBLockerModel, success: @escaping (CBLockerModel) -> Void, failure: @escaping (SPRError) -> Void) {
-        sprLockerService.getLocker(
-            token: token,
-            spacerId: spacerId,
-            success: { spacer in
-                var locker = locker
-                locker.isHttpSupported = spacer.isHttpSupported
-                success(locker)
-            },
-            failure: failure
-        )
-    }
-
-    private func connectWithRetry(locker: CBLockerModel, retryNum: Int = 0) {
-        if locker.isHttpSupported, !locker.isScanned, isPermitted {
-            locationManager.requestLocation()
+        if let isHttpSupported = cachedHttpSupported {
+            var locker = locker
+            locker.isHttpSupported = isHttpSupported
+            connectable(locker)
         } else {
-            guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
-            let peripheralDelegate =
-                CBLockerPeripheralService.Factory.create(
-                    type: type, token: token, locker: locker, isRetry: retryNum > 0,
-                    success: {
-                        self.success()
-                        self.disconnect(locker: locker)
-                    },
-                    failure: { error in
-                        if locker.isHttpSupported, !self.hasBLERetried, self.httpFallbackErrors.contains(error), self.isPermitted {
-                            self.locationManager.requestLocation()
-                        } else {
-                            self.retryOrFailure(
-                                error: error,
-                                locker: locker,
-                                retryNum: retryNum + 1,
-                                executable: { self.connectWithRetry(locker: locker, retryNum: retryNum + 1) }
-                            )
-                        }
-                    }
-                )
-
-            guard let delegate = peripheralDelegate else { return failure(SPRError.CBConnectingFailed) }
-
-            locker.peripheral?.delegate = delegate
-            delegate.startConnectingAndDiscoveringServices()
-            centralService?.connect(peripheral: peripheral)
+            sprLockerService.getLocker(
+                token: token,
+                spacerId: spacerId,
+                success: { spacer in
+                    var locker = locker
+                    locker.isHttpSupported = spacer.isHttpSupported
+                    self.cachedHttpSupported = spacer.isHttpSupported
+                    success(locker)
+                },
+                failure: failure
+            )
         }
     }
-
+    
+    private func connectWithRetry(locker: CBLockerModel, retryNum: Int = 0) {
+        guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
+        let peripheralDelegate =
+            CBLockerPeripheralService.Factory.create(
+                type: type, token: token, locker: locker, isRetry: retryNum > 0,
+                success: {
+                    self.success()
+                    self.disconnect(locker: locker)
+                },
+                failure: { error in
+                    self.retryOrFailure(
+                        error: error,
+                        locker: locker,
+                        retryNum: retryNum + 1,
+                        executable: { self.connectWithRetry(locker: locker, retryNum: retryNum + 1) }
+                    )
+                }
+            )
+            
+        guard let delegate = peripheralDelegate else { return failure(SPRError.CBConnectingFailed) }
+            
+        locker.peripheral?.delegate = delegate
+        delegate.startConnectingAndDiscoveringServices()
+        centralService?.connect(peripheral: peripheral)
+    }
+    
     private func retryOrFailure(error: SPRError, locker: CBLockerModel, retryNum: Int, executable: @escaping () -> Void) {
         if retryNum < CBLockerConst.MaxRetryNum {
-            hasBLERetried = true
             executable()
         } else {
             failure(error)
             disconnect(locker: locker)
         }
     }
-
+    
     private func disconnect(locker: CBLockerModel) {
         guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
         centralService?.disconnect(peripheral: peripheral)
     }
-
+    
     private func checkDoorStatusAvailable(locker: CBLockerModel) {
         if locker.isScanned {
             guard let peripheral = locker.peripheral else { return failure(SPRError.CBPeripheralNotFound) }
@@ -171,9 +166,9 @@ class CBLockerCentralConnectService: NSObject {
                         self.readSuccess(locker.isHttpSupported)
                     }
                 )
-
+            
             let delegate = peripheralDelegate
-
+            
             locker.peripheral?.delegate = delegate
             delegate.startConnectingAndDiscoveringServices()
             centralService?.connect(peripheral: peripheral)
@@ -181,14 +176,12 @@ class CBLockerCentralConnectService: NSObject {
             readSuccess(locker.isHttpSupported)
         }
     }
-
-    func httpLockerServices(lat: Double?, lng: Double?) {
+    
+    private func httpLockerServices() {
         if type == .put {
             httpLockerService.put(
                 token: token,
                 spacerId: spacerId,
-                lat: lat,
-                lng: lng,
                 success: success,
                 failure: { error in self.failure(error) }
             )
@@ -196,8 +189,13 @@ class CBLockerCentralConnectService: NSObject {
             httpLockerService.take(
                 token: token,
                 spacerId: spacerId,
-                lat: lat,
-                lng: lng,
+                success: success,
+                failure: { error in self.failure(error) }
+            )
+        } else if type == .reservedOpen {
+            httpLockerService.reservedOpen(
+                token: token,
+                spacerId: spacerId,
                 success: success,
                 failure: { error in self.failure(error) }
             )
@@ -205,12 +203,37 @@ class CBLockerCentralConnectService: NSObject {
             httpLockerService.openForMaintenance(
                 token: token,
                 spacerId: spacerId,
-                lat: lat,
-                lng: lng,
                 success: success,
                 failure: { error in self.failure(error) }
             )
         }
+    }
+    
+    private func prepareAndScan(
+        isScan: Bool,
+        success: @escaping () -> Void,
+        failure: @escaping (SPRError) -> Void
+    ) {
+        updateHttpSupportStatus(
+            locker: CBLockerModel(id: spacerId),
+            success: {
+                [weak self] locker in
+                guard let self = self else { return }
+                
+                self.cachedHttpSupported = locker.isHttpSupported
+            
+                if locker.isHttpSupported {
+                    self.httpLockerServices()
+                } else if isScan {
+                    self.connectable = { [weak self] scanLocker in self?.connectWithRetry(locker: scanLocker) }
+                    self.scan()
+                } else {
+                    failure(SPRError.CBServiceNotSupported)
+                }
+            }, failure: { error in
+                failure(error)
+            }
+        )
     }
 }
 
@@ -254,26 +277,6 @@ extension CBLockerCentralConnectService: CBLockerCentralDelegate {
                 },
                 failure: failure
             )
-        }
-    }
-}
-
-extension CBLockerCentralConnectService: CLLocationManagerDelegate {
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.last {
-            let lat = location.coordinate.latitude
-            let lng = location.coordinate.longitude
-            if !isExecutingHttpService {
-                isExecutingHttpService = true
-                httpLockerServices(lat: lat, lng: lng)
-            }
-        }
-    }
-
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        if !isExecutingHttpService {
-            isExecutingHttpService = true
-            httpLockerServices(lat: nil, lng: nil)
         }
     }
 }

@@ -30,6 +30,7 @@ enum ApiPaths {
     static let LocationGet = "location/get"
     static let LocationRPiBoxPut = "locationRPi/box/put"
     static let LocationRPiBoxTake = "locationRPi/box/take"
+    static let LocationRPiBoxReservedOpen = "locationRPi/box/reservedOpen"
     static let LocationRPiBoxOpenForMaintenance = "locationRPi/box/openForMaintenance"
     static let MaintenanceKeyGet = "key/maintenance/get"
     static let MaintenanceKeyGetResult = "key/maintenance/getResult"

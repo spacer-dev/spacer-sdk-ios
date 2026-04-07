@@ -12,38 +12,54 @@ public class HttpLockerService {
     /// - Parameters:
     ///   - token: User token created on the server
     ///   - spacerId: Locker IDs, ex)  "SPACER054"
-    ///   - lat: User current location latitude, ex)  "12.099406802793892"
-    ///   - lng: User current location longitude, ex)  "209.004948393847015"
     ///   - success: Callback on success
     ///   - failure: Callback on failure
-    public func put(token: String, spacerId: String, lat: Double?, lng: Double?, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
-        let reqData = HttpLockerReqData(spacerId: spacerId, lat: lat, lng: lng)
+    public func put(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+        let reqData = HttpLockerReqData(spacerId: spacerId)
 
         API.post(
             path: ApiPaths.LocationRPiBoxPut,
             token: token,
             reqData: reqData,
             success: { (_: HttpLockerResData) in success() },
-            failure: failure)
+            failure: failure
+        )
     }
 
     /// Get multiple locker unit basic information
     /// - Parameters:
     ///   - token: User token created on the server
     ///   - spacerId: Locker Unit IDs, ex) "SPACER054"
-    ///   - lat: User current location latitude, ex)  "12.099406802793892"
-    ///   - lng: User current location longitude, ex)  "209.004948393847015"
     ///   - success: Callback on success
     ///   - failure: Callback on failure
-    public func take(token: String, spacerId: String, lat: Double?, lng: Double?, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
-        let reqData = HttpLockerReqData(spacerId: spacerId, lat: lat, lng: lng)
+    public func take(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+        let reqData = HttpLockerReqData(spacerId: spacerId)
 
         API.post(
             path: ApiPaths.LocationRPiBoxTake,
             token: token,
             reqData: reqData,
             success: { (_: HttpLockerResData) in success() },
-            failure: failure)
+            failure: failure
+        )
+    }
+
+    /// Get multiple locker unit basic information
+    /// - Parameters:
+    ///   - token: User token created on the server
+    ///   - spacerId: Locker Unit IDs, ex) "SPACER054"
+    ///   - success: Callback on success
+    ///   - failure: Callback on failure
+    public func reservedOpen(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+        let reqData = HttpLockerReqData(spacerId: spacerId)
+
+        API.post(
+            path: ApiPaths.LocationRPiBoxReservedOpen,
+            token: token,
+            reqData: reqData,
+            success: { (_: HttpLockerResData) in success() },
+            failure: failure
+        )
     }
 
     /// Get multiple locker unit basic information
@@ -54,14 +70,15 @@ public class HttpLockerService {
     ///   - lng: User current location longitude, ex)  "209.004948393847015"
     ///   - success: Callback on success
     ///   - failure: Callback on failure
-    public func openForMaintenance(token: String, spacerId: String, lat: Double?, lng: Double?, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
-        let reqData = HttpLockerReqData(spacerId: spacerId, lat: lat, lng: lng)
+    public func openForMaintenance(token: String, spacerId: String, success: @escaping () -> Void, failure: @escaping (SPRError) -> Void) {
+        let reqData = HttpLockerReqData(spacerId: spacerId)
 
         API.post(
             path: ApiPaths.LocationRPiBoxOpenForMaintenance,
             token: token,
             reqData: reqData,
             success: { (_: HttpLockerResData) in success() },
-            failure: failure)
+            failure: failure
+        )
     }
 }
